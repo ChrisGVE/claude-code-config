@@ -56,13 +56,22 @@ When starting a new project:
 4. Use `task-master parse-prd` to generate tasks
 5. Store PRD.txt in project root
 
+## Task Management - CRITICAL
+
+**NEVER create todo lists in CLAUDE.md or any other file**
+- `task-master` IS your todo system
+- Use `task-master get_tasks` to view tasks
+- Use `task-master add_task` to add tasks
+- Use `task-master set_task_status` to update
+- For EACH task: use `sequential-thinking` to break it down
+
 ## Workflow
 
 1. **Initialize session**
    - **ALWAYS**: Read Serena's initial instructions first
    - Check if `claude-context` has indexed the codebase
    - Read PRD.txt (help create if missing - use template, get confirmation, then `task-master parse-prd`)
-   - Use `task-master` to view/manage all tasks (NO separate todo lists in CLAUDE.md)
+   - Use `task-master` to view/manage all tasks (NO separate todo lists)
    - Check ALGO.md and memory for existing algorithms
    - Ask clarifications before assumptions
    - For URLs: fetch recursively until you have all context
