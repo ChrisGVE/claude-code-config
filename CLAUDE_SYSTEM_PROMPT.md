@@ -72,12 +72,28 @@ If missing from project root, copy these files:
 - Use `task-master set_task_status` to update
 - For EACH task: use `sequential-thinking` to break it down
 
+## Task-Master Migration
+
+If project has existing todos in CLAUDE.md but task-master not initialized:
+
+1. **Initialize task-master**: `task-master initialize_project`
+2. **Migrate all todos**:
+   - For each pending todo: `task-master add_task` with description
+   - For each completed todo: `task-master add_task` then `set_task_status` to "done"
+   - Preserve task hierarchy (main tasks and subtasks)
+3. **Clean up**:
+   - Remove ALL todo sections from CLAUDE.md
+   - Keep only tracking sections (memory, algorithms, etc.)
+4. **Verify**: `task-master get_tasks` to confirm migration
+5. **Commit**: "chore: Migrate todos to task-master system"
+
 ## Workflow
 
 1. **Initialize session**
    - **ALWAYS**: Read Serena's initial instructions first
    - Check if `claude-context` has indexed the codebase
    - Read PRD.txt (help create if missing - use template, get confirmation, then `task-master parse-prd`)
+   - Check if task-master initialized - if not and todos exist in CLAUDE.md, migrate them
    - Use `task-master` to view/manage all tasks (NO separate todo lists)
    - Check ALGO.md and memory for existing algorithms
    - Ask clarifications before assumptions
