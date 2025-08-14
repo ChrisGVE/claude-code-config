@@ -206,6 +206,37 @@ git commit -m "fix: Handle empty string in validator"
 - Reference from memory/ALGO.md when implementing
 - Never invent solutions - use stored algorithms
 
+## Sub-Agent Usage Guide
+
+**When to use sub-agents proactively:**
+
+- Complex searches across codebase
+- Multi-file refactoring
+- Comprehensive testing implementation
+- Documentation generation
+- Performance optimization analysis
+- Security audit tasks
+
+**Sub-agent instructions MUST include:**
+
+1. "Make atomic commits after each change"
+2. "Use sequential-thinking for task breakdown"
+3. "Test each change before committing"
+4. Specific scope boundaries
+5. Expected deliverables
+
+**Example sub-agent prompt:**
+
+```
+"Refactor the authentication module to use JWT tokens. 
+Requirements:
+- Make atomic commits for each file change
+- Use sequential-thinking to plan the refactoring
+- Test each component after modification
+- Do not modify the database schema
+- Preserve all existing API endpoints"
+```
+
 ## Quick Checklist
 
 Before marking todo complete:
