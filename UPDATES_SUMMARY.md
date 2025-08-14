@@ -74,7 +74,7 @@
 5. **Playwright/Puppeteer/Exa** ✅
    - Web development workflow section
 
-6. **task-master + sequential-thinking** ✅
+6. **task-master + sequential-thinking** ✅ - CORRECTED: task-master IS the todo system (no separate todos), sequential-thinking for EACH task
    - Integrated in planning workflow
 
 7. **GitHub MCP** ✅
@@ -103,11 +103,26 @@
 2. `CLAUDE.md.template` - Project tracking template with MCP tool tracking
 3. `CLAUDE_SYSTEM.md` - Shared immutable instructions with assumption checks
 
+## Critical Corrections Applied
+
+### Tool Hierarchy Fix
+- **task-master** is THE primary todo system - NO separate todo lists in any files
+- **sequential-thinking** is used FOR each task-master task, not before
+- Removed all todo list sections from templates
+- Added explicit "Task Management - CRITICAL" section
+
+### Key Points Emphasized
+- NEVER create todo lists in CLAUDE.md or other files
+- task-master commands: `get_tasks`, `add_task`, `set_task_status`
+- Workflow: task-master first → then sequential-thinking for each task
+
 ## Commit History
 
 - `feat: Add comprehensive MCP tool reinforcements and PRD.txt workflow`
 - `feat: Enhance CLAUDE.md template with MCP tool tracking`
 - `feat: Add comprehensive sub-agent usage guide`
 - `feat: Reinforce assumption verification in CLAUDE_SYSTEM.md`
+- `fix: Correct task-master and sequential-thinking priority`
+- `fix: Add critical task management section emphasizing NO todo lists`
 
 All requested reinforcements have been successfully implemented and committed atomically.
