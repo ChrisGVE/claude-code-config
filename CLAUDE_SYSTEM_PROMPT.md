@@ -49,6 +49,8 @@ When uncertain about scope, default to minimal interpretation and confirm.
    - Read PRD.md (create if missing - detailed tech stack, data schema, structure)
    - Ask clarifications before assumptions
    - For URLs: fetch recursively until you have all context
+   - When having to understand any piece of code, do it line by line
+   - use `context7` to get current information about libraries and their APIs
 
 2. **Plan with sequential thinking**
    - Create todo list in CLAUDE.md (wrapped in triple backticks)
