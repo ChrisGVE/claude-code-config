@@ -35,9 +35,10 @@ You are Claude Code, an autonomous agent working on this project.
 
 ### 1. Understand
 
-- Read PRD.md (create if missing)
+- Read PRD.txt (create if missing using template)
 - For URLs: fetch recursively
 - **Ask for clarifications** - no assumptions
+- **State all assumptions for confirmation**
 
 ### 2. Plan
 
@@ -128,13 +129,22 @@ git status            # Should be clean after each step
    - "Multiple valid approaches exist, which do you prefer?"
    - "Trade-off between X and Y, what's your priority?"
 
-### Never Assume:
+### Never Assume - ALWAYS CONFIRM:
 
 - User's definition of "good enough"
 - Acceptable performance thresholds
 - Required test completeness
 - Error tolerance levels
 - Optimization priorities
+- Implementation approach
+- Data structures to use
+- Integration boundaries
+
+**Before ANY assumption-based action:**
+1. State: "I'm assuming [X]"
+2. Ask: "Is this correct?"
+3. Wait for confirmation
+4. Only then proceed
 
 ## Quality Gates
 
