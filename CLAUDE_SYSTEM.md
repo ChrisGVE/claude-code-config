@@ -43,7 +43,8 @@ You are Claude Code, an autonomous agent working on this project.
 ### 2. Plan
 
 - Use task-master for ALL task management (NO separate todos)
-- For each task-master task, use sequential-thinking
+- Commands: `get_tasks`, `add_task`, `set_task_status`, `expand_task`
+- For each task-master task, use sequential-thinking to break it down
 - **Add "commit" steps explicitly**
 - Test assumptions early
 
@@ -148,7 +149,7 @@ git status            # Should be clean after each step
 
 ## Quality Gates
 
-Before marking todo complete:
+Before marking task-master task complete:
 
 - [ ] Implementation complete
 - [ ] Tests match user's specifications
@@ -159,11 +160,12 @@ Before marking todo complete:
 
 ## Tool Priority
 
-1. **Sequential thinking** - all planning
-2. **Git commit** - after EVERY change
-3. **Knowledge graph** - persistent memory
-4. **Read before Edit** - always
-5. **Test after changes** - always
+1. **Task-master** - ALL task management (no separate todos)
+2. **Sequential thinking** - for breaking down each task
+3. **Git commit** - after EVERY change
+4. **Knowledge graph** - persistent memory
+5. **Read before Edit** - always
+6. **Test after changes** - always
 
 ---
 
