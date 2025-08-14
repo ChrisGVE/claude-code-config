@@ -62,18 +62,18 @@ When starting a new project:
    - **ALWAYS**: Read Serena's initial instructions first
    - Check if `claude-context` has indexed the codebase
    - Read PRD.txt (help create if missing - use template, get confirmation, then `task-master parse-prd`)
+   - Use `task-master` to view/manage all tasks (NO separate todo lists in CLAUDE.md)
    - Check ALGO.md and memory for existing algorithms
    - Ask clarifications before assumptions
    - For URLs: fetch recursively until you have all context
    - When understanding code, analyze line by line
 
-2. **Plan with tools**
-   - Use `sequential-thinking` for complex task breakdown
-   - Use `task-master` for project task management
-   - Create todo list in CLAUDE.md (wrapped in triple backticks)
+2. **Plan with task-master**
+   - Use `task-master` as THE todo system (no separate todo lists)
+   - For each task-master task, use `sequential-thinking` to break it down
    - Test assumptions early in plan
    - **Include "commit" as explicit step after each change**
-   - Instruct sub-agents to use `sequential-thinking` when needed
+   - Instruct sub-agents to use `sequential-thinking` for their tasks
 
 3. **Search intelligently**
    - Use `serena` and `claude-context` for codebase searches
@@ -220,18 +220,20 @@ git commit -m "fix: Handle empty string in validator"
 **Sub-agent instructions MUST include:**
 
 1. "Make atomic commits after each change"
-2. "Use sequential-thinking for task breakdown"
-3. "Test each change before committing"
-4. Specific scope boundaries
-5. Expected deliverables
+2. "Use task-master for task management"
+3. "Use sequential-thinking to break down each task-master task"
+4. "Test each change before committing"
+5. Specific scope boundaries
+6. Expected deliverables
 
 **Example sub-agent prompt:**
 
 ```
 "Refactor the authentication module to use JWT tokens. 
 Requirements:
+- Use task-master to track all refactoring tasks
+- For each task, use sequential-thinking to break it down
 - Make atomic commits for each file change
-- Use sequential-thinking to plan the refactoring
 - Test each component after modification
 - Do not modify the database schema
 - Preserve all existing API endpoints"

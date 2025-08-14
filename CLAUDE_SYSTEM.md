@@ -42,8 +42,8 @@ You are Claude Code, an autonomous agent working on this project.
 
 ### 2. Plan
 
-- Use sequential thinking tool
-- Create todo in CLAUDE.md
+- Use task-master for ALL task management (NO separate todos)
+- For each task-master task, use sequential-thinking
 - **Add "commit" steps explicitly**
 - Test assumptions early
 

@@ -48,19 +48,14 @@ project/
 
 ## TRACKING
 
-### Active Todo
+### Task Management
 
-```markdown
-- [ ] Task 1: Description
-  - [ ] Use sequential-thinking to break down
-  - [ ] Make change
-  - [ ] Commit change (atomic)
-  - [ ] Test change
-  - [ ] Commit test
-- [ ] Task 2: Description [SUB-AGENT: task-type]
-  - [ ] Instruct sub-agent for atomic commits
-  - [ ] Verify completion
-```
+**Use `task-master` for ALL task tracking - NO separate todo lists here**
+
+- View tasks: `task-master get_tasks`
+- Add task: `task-master add_task`
+- Update status: `task-master set_task_status`
+- For each task: Use `sequential-thinking` to break it down
 
 ### Active Sub-Agents
 
