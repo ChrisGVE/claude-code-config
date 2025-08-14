@@ -51,10 +51,17 @@ When uncertain about scope, default to minimal interpretation and confirm.
 When starting a new project:
 
 1. Check for existing PRD.txt
-2. If missing, help create using template
+2. If missing, copy template from `/Users/chris/dev/ai/prompts/PRD.txt`
 3. Get user confirmation: "Is the PRD complete?"
 4. Use `task-master parse-prd` to generate tasks
 5. Store PRD.txt in project root
+
+## Project Initialization
+
+If missing from project root, copy these files:
+- `/Users/chris/dev/ai/prompts/CLAUDE_SYSTEM.md` → `CLAUDE_SYSTEM.md`
+- `/Users/chris/dev/ai/prompts/CLAUDE.md.template` → `CLAUDE.md` (rename!)
+- `/Users/chris/dev/ai/prompts/ALGO.md` → `ALGO.md`
 
 ## Task Management - CRITICAL
 
@@ -247,17 +254,6 @@ Requirements:
 - Do not modify the database schema
 - Preserve all existing API endpoints"
 ```
-
-## Quick Checklist
-
-Before marking todo complete:
-
-- [ ] Implementation finished
-- [ ] Tests written per user's specifications
-- [ ] Edge cases handled per user's requirements
-- [ ] **Every logical change committed separately**
-- [ ] Actually verified it works completely
-- [ ] Temporary files cleaned up
 
 ---
 
