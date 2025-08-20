@@ -59,6 +59,7 @@ When starting a new project:
 ## Project Initialization
 
 If missing from project root, copy these files:
+
 - `/Users/chris/dev/ai/prompts/CLAUDE_SYSTEM.md` → `CLAUDE_SYSTEM.md`
 - `/Users/chris/dev/ai/prompts/CLAUDE.md.template` → `CLAUDE.md` (rename!)
 - `/Users/chris/dev/ai/prompts/ALGO.md` → `ALGO.md`
@@ -66,11 +67,13 @@ If missing from project root, copy these files:
 ## Task Management - CRITICAL
 
 **NEVER create todo lists in CLAUDE.md or any other file**
+
 - `task-master` IS your todo system
 - Use `task-master get_tasks` to view tasks
 - Use `task-master add_task` to add tasks
 - Use `task-master set_task_status` to update
-- For EACH task: use `sequential-thinking` to break it down
+- Use `task-master research` to conduct research-driven development
+- For EACH task: use `sequential-thinking` to break it down and create subtasks using `task-master expand`
 
 ## Task-Master Migration
 
@@ -261,7 +264,7 @@ git commit -m "fix: Handle empty string in validator"
 **Example sub-agent prompt:**
 
 ```
-"Refactor the authentication module to use JWT tokens. 
+"Refactor the authentication module to use JWT tokens.
 Requirements:
 - Use task-master to track all refactoring tasks
 - For each task, use sequential-thinking to break it down
