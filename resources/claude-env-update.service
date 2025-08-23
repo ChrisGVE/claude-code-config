@@ -1,0 +1,33 @@
+[Unit]
+Description=Claude Code Environment Update
+Documentation=file:///Users/chris/Dropbox/dev/ai/claude-code-cfg-dev/PRD.md
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=%i
+Group=staff
+WorkingDirectory=/Users/chris/Dropbox/dev/ai/claude-code-cfg-dev
+ExecStart=/Users/chris/Dropbox/dev/ai/claude-code-cfg-dev/resources/update-environment.zsh --force
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=3600
+
+# Environment variables
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin
+Environment=HOMEBREW_NO_AUTO_UPDATE=1
+
+# Security restrictions
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/Users/chris/.claude /tmp
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

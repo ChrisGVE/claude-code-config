@@ -1,0 +1,62 @@
+services:
+  milvus:
+    image: milvusdb/milvus:v2.5.12
+    container_name: claude-context-milvus
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_USE_EMBED: "true"
+      ETCD_DATA_DIR: /var/lib/milvus/etcd
+      COMMON_STORAGETYPE: local
+    ports:
+      - "19530:19530"  # Milvus API port
+      - "9091:9091"    # Milvus metrics port
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "timeout 5 bash -c '</dev/tcp/localhost/19530' || exit 1"
+      interval: 5s
+      timeout: 3s
+      retries: 60
+    volumes:
+      - /Users/chris/dev/ai/mcp/persistent_memory/milvus/volumes:/var/lib/milvus
+
+  claude-context-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    depends_on:
+      milvus:
+        condition: service_healthy
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-openai}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      MILVUS_ADDRESS: milvus:19530
+      WORKSPACE: ${WORKSPACE:-/workspace}
+    command: ["claude-context-mcp"]
+    volumes:
+      - ${WORKSPACE:-$PWD}:/workspace:rw
+      - ${HOME}/.context:/root/.context:rw
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    profiles: ["web-ingest"]
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - INSTANCE_NAME=Local SearxNG
+      - AUTOCOMPLETE=false
+    volumes:
+      - ./searxng-config:/etc/searxng:rw
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://localhost:8080/healthz || curl -fsS http://localhost:8080 || exit 1",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+    restart: unless-stopped

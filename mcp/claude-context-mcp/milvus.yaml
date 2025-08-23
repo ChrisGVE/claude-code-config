@@ -1,0 +1,29 @@
+# Minimal config to prevent internal port collisions
+etcd:
+  endpoints: ["localhost:2379"]
+  use:
+    embed: true
+
+proxy:
+  address: 0.0.0.0
+  port: 19530
+
+rootCoord:
+  address: 127.0.0.1
+  port: 53100
+
+dataCoord:
+  address: 127.0.0.1
+  port: 13333
+
+queryCoord:
+  address: 127.0.0.1
+  port: 19531
+
+indexCoord:
+  address: 127.0.0.1
+  port: 31001
+
+common:
+  http:
+    port: 9091
