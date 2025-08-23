@@ -16,3 +16,6 @@
 [submodule "mcp/localdata-mcp"]
 	path = mcp/localdata-mcp
 	url = git@github.com:ChrisGVE/localdata-mcp.git
+[submodule "mcp/serena"]
+	path = mcp/serena
+	url = https://github.com/oraios/serena.git
