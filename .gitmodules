@@ -1,0 +1,6 @@
+[submodule "subagent-example-script"]
+	path = subagent-example-script
+	url = https://github.com/derek-opdee/subagent-example-script.git
+[submodule "awesome-claude-code-subagents"]
+	path = awesome-claude-code-subagents
+	url = https://github.com/VoltAgent/awesome-claude-code-subagents.git
