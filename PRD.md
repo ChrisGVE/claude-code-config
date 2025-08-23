@@ -6,7 +6,7 @@ The project is defined in three parts:
 
 1. Setting up the mcp components as per the specifications below, their current state is stored in the `mcp/` folder of this project.
 2. Updating the existing prompting system, consisting of a global system prompt and a per-project prompt, their current state is stored in the `prompts/` folder of this project.
-3. Creating two subagents that will be deployed permanently as per the specifications below, their `.md` files is to be stored into `prompts/agents`
+3. Creating project-specific subagents for planning phases, their `.md` files stored in `prompts/agents`
 
 # Core Features
 
@@ -16,8 +16,8 @@ The project is defined in three parts:
 
 - **Task-master** is the **source of truth for all tasks**.
 - **Sequential-Thinking** creates task DAGs from PRDs and persists them to Task-master.
-- **Serena** executes development tasks (build, fix, refactor), updates statuses, and reports back to Task-master. Serena delegates QA tasks to QA Orchestrator.
-- **QA Orchestrator** handles all testing tasks via Temporal workflow orchestration, creates bug fix tasks in Task-master.
+- **Serena** executes development tasks (build, fix, refactor), updates statuses, and reports back to Task-master. Serena delegates QA tasks to QA Engine MCP.
+- **QA Engine MCP** handles all testing tasks via self-contained workflow orchestration, creates bug fix tasks in Task-master.
 - **GitHub MCP** is used only for repo management (creation, linking to project, and optional issue mirroring).
 
 ## Codebase Context
@@ -35,10 +35,10 @@ The project is defined in three parts:
 
 ## Subagents
 
-- **Planner Subagent**: handles PRD → task DAG conversion, writes to Task-master only.
-- **Architect Subagent**: manages architectural decisions and ADRs, stores summaries in Qdrant.
-- **QA Orchestrator**: specialized agent for testing workflows, uses Temporal for durable orchestration.
-- All subagents are deployed per-project via registry-based selection.
+- **Planner Subagent**: handles PRD → task DAG conversion, writes to Task-master only. Active during bootstrap and PRD revision phases.
+- **Architect Subagent**: manages architectural decisions and ADRs, stores summaries in Qdrant. Active during bootstrap and architectural planning phases.
+- **QA Engine MCP**: specialized MCP for testing workflows, uses Temporal for durable orchestration.
+- Project-specific subagents are deployed during planning phases via registry-based selection.
 
 ## Project Profiles
 
@@ -93,12 +93,14 @@ mcps:
     integration: "corrode-mcp"
 
 subagents:
-  qa-orchestrator:
-    signals: ["testing", "qa"]
-    source: "agents/qa-orchestrator.md"
   planner:
-    signals: ["planning"]
+    signals: ["planning", "prd_work"]
     source: "agents/planner.md"
+    phase: "bootstrap"
+  architect:
+    signals: ["architecture", "prd_work"]
+    source: "agents/architect.md"
+    phase: "bootstrap"
 
 prompts:
   claude-md:
@@ -158,7 +160,7 @@ Existing Project: Code exploration → Qdrant review → PRD review → Bootstra
 
   3. Sequential-Thinking generates initial tasks → Task-master.
   4. Serena executes ready tasks, querying Claude-Context for code and Qdrant for project memory.
-  5. Debugging/QA MCP validates outputs at each phase and ensures feedback loops.
+  5. QA Engine MCP validates outputs at each phase and ensures feedback loops.
 
 - **Context Management**:
   - Serena and subagents fetch **summaries first** from Qdrant.
@@ -264,17 +266,17 @@ The Qdrant MCP requires you to define the payload used by `qdrant-store`/`qdrant
 6. **Embed** via **Ollama** (`nomic-embed-text`) _or_ **FastEmbed**; ensure vector size matches the collection.
 7. **Upsert** to Qdrant with the payload contract above.
 
-### QA Architecture (Specialized Orchestrator Model)
+### QA Architecture (Specialized MCP Model)
 
 **Objective**: Durable, state-as-data QA workflows with clear separation of concerns.
 
-**Architecture Decision:** Specialized QA Orchestrator handles all testing workflows, with Serena focused on development tasks.
+**Architecture Decision:** Specialized QA Engine MCP handles all testing workflows, with Serena focused on development tasks.
 
 **Component Roles:**
 
 - **Task-master**: Source of truth for all tasks (including QA tasks)
-- **Serena**: Executes development tasks, delegates QA tasks to QA Orchestrator, handles bug fixes
-- **QA Orchestrator**: Specialized agent using Temporal for durable workflow orchestration
+- **Serena**: Executes development tasks, delegates QA tasks to QA Engine MCP, handles bug fixes
+- **QA Engine MCP**: Specialized MCP using Temporal for durable workflow orchestration
 - **QA MCP**: Thin interface layer over Gitea Issues + Kiwi TCMS + ReportPortal + Temporal
 
 **Tool Stack (Self-hosted, GitHub-compatible):**
@@ -336,14 +338,14 @@ All QA state lives in systems, not prompts:
 **Workflow Example:**
 
 1. **Serena** completes development Task 15
-2. **Serena** encounters QA Task 16 → delegates to **QA Orchestrator**
-3. **QA Orchestrator** (via Temporal):
+2. **Serena** encounters QA Task 16 → delegates to **QA Engine MCP**
+3. **QA Engine MCP** (via Temporal):
    - Creates test campaign in Kiwi TCMS
    - Spawns test execution subagents
    - **If bugs found**: creates bugs in Gitea Issues + Task 17 with subtasks
    - Marks Task 16 as `done` (campaign complete)
 4. **Serena** handles subtasks 17.1, 17.2, 17.3 (fixes)
-5. **QA Orchestrator** verification: re-runs tests, closes bugs if successful
+5. **QA Engine MCP** verification: re-runs tests, closes bugs if successful
 
 **Bug Lifecycle Integration:**
 - **Gitea Issues**: Detailed bug states (Open → In Progress → Fixed → Closed)
@@ -357,7 +359,7 @@ All QA state lives in systems, not prompts:
 - **Update Scheduling**: Batch scripts for regular tool updates (Gitea, Kiwi TCMS, ReportPortal, Temporal)
 
 **Role Contracts & Guardrails:**
-- **QA Orchestrator**: 1-2 sentence mission + allowed QA tools only
+- **QA Engine MCP**: 1-2 sentence mission + allowed QA tools only
 - **Subagents**: Specific roles (test executor, triage analyst) with tool restrictions  
 - **Budget enforcement**: Token/time limits with orchestrator oversight
 - **Human gates**: Required approval for campaign closure, critical bug triage
@@ -365,8 +367,8 @@ All QA state lives in systems, not prompts:
 ## System Components
 
 - **Claude Code**: MCP orchestrator.
-- **MCP Servers**: Task-master, Claude-Context, Qdrant, GitHub, Time, Sequential-Thinking, **Debugging/QA MCP**, and optional project‑specific servers.
-- **Subagents**: Planner, Architect.
+- **MCP Servers**: Task-master, Claude-Context, Qdrant, GitHub, Time, Sequential-Thinking, **QA Engine MCP**, and optional project‑specific servers.
+- **Project Subagents**: Planner, Architect (deployed during bootstrap/PRD phases only).
 
 ## Infrastructure
 
@@ -386,7 +388,7 @@ All QA state lives in systems, not prompts:
 **Tool Installation Preference:**
 1. **Global tools**: `uv tool install <mcp>` or `npm install -g <mcp>`
 2. **Docker fallback**: For tools requiring complex dependencies
-3. **Update automation**: Scheduled batch scripts for tool maintenance
+3. **Update automation**: Manual execution with registry-driven commands
 
 **GitHub Ecosystem Compatibility:**
 - Gitea Actions uses GitHub Actions YAML syntax
@@ -433,9 +435,8 @@ Registry-driven `.claude/project.json` generation:
     }
   },
   "subagents": {
-    "planner": { "path": ".claude/agents/planner.md" },
-    "architect": { "path": ".claude/agents/architect.md" },
-    "qa-orchestrator": { "path": ".claude/agents/qa-orchestrator.md" }
+    "planner": { "path": ".claude/agents/planner.md", "phase": "bootstrap" },
+    "architect": { "path": ".claude/agents/architect.md", "phase": "bootstrap" }
   }
 }
 ```
@@ -446,13 +447,13 @@ Registry-driven `.claude/project.json` generation:
 
 - Task-master as task authority with simplified QA task hierarchy.
 - Sequential-Thinking → Task-master integration.
-- Serena executes development tasks, delegates QA to QA Orchestrator.
-- QA Orchestrator with Temporal workflows and specialized tool stack.
+- Serena executes development tasks, delegates QA to QA Engine MCP.
+- QA Engine MCP with Temporal workflows and specialized tool stack.
 - Qdrant integration for project memory, per-project collections.
 - Ingest-web modified to push into Qdrant via SearxNG.
 - Registry-driven `.claude/project.json` bootstrap script.
 - QA MCP as thin layer over Gitea + Kiwi TCMS + ReportPortal + Temporal.
-- Update automation via scheduled batch scripts.
+- Update automation via manual execution with registry-driven commands.
 
 ## Future Enhancements
 
@@ -469,7 +470,7 @@ Registry-driven `.claude/project.json` generation:
 4. Keep Claude-Context self-contained with Milvus + Ollama.
 5. Deploy Qdrant + Qdrant-MCP, adapt ingest-web.
 6. Implement project bootstrap config generator.
-7. Add Debugging/QA MCP pipeline.
+7. Add QA Engine MCP pipeline.
 8. Add optional MCPs as per project profiles.
 
 # Risks and Mitigations
@@ -478,7 +479,7 @@ Registry-driven `.claude/project.json` generation:
 - **Context bloat** → mitigated by summary-first retrieval in Qdrant.
 - **Embedding quality tradeoffs** → default to Ollama nomic-embed-text; test FastEmbed as fallback.
 - **Complexity in per-project configs** → mitigated with bootstrap script and registry-driven rules.
-- **QA pipeline failures** → mitigated by Debugging/QA MCP with retries, logging, and Task-master status hooks.
+- **QA pipeline failures** → mitigated by QA Engine MCP with progressive testing, smart circuit breaking, and container isolation.
 
 # Permanent Subagents Definitions
 
@@ -520,30 +521,7 @@ Owns system and code architecture decisions (boundaries, components, data contra
 - Favor ADRs (short, versioned). Don't push long blobs into context; store then summarize.
 ```
 
-**QA Orchestrator Subagent (`qa-orchestrator.md`)**
-
-```md
-# Subagent: QA Orchestrator
-
-## Role
-
-Orchestrates testing workflows using Temporal for durable, state-as-data QA processes.
-
-## Tools
-
-- qa-mcp: campaign management, test execution, bug tracking
-- temporal: workflow orchestration, retries, state management
-- task-master: create fix tasks and subtasks
-- qdrant: store test summaries and decisions
-
-## Guardrails
-
-- Never execute development tasks - only testing workflows
-- All state in external systems (Kiwi TCMS, ReportPortal, Gitea)
-- Create fix tasks in Task-master when bugs found
-- Use simplified task hierarchy: campaign → fix task → bug subtasks
-- Enforce human approval gates for critical decisions
-```
+**Note**: QA Engine MCP is a self-contained MCP server (like task-master) and does not require a separate global subagent definition. It may use internal subagents for workflow orchestration, but these are managed within the MCP itself.
 
 # Example Code Snippets
 
@@ -702,7 +680,7 @@ for h in hits:
   “Reference Task IDs (e.g., `8`, `8.1`) in commits, PR titles, Qdrant `related_task_ids`, and ADRs.”
 
 - **Role boundaries**  
-  "Serena: development, fixes, refactoring. QA Orchestrator: testing workflows via Temporal. Clear handoff at QA task delegation."
+  "Serena: development, fixes, refactoring. QA Engine MCP: testing workflows via Temporal. Clear handoff at QA task delegation."
 
 - **QA workflow hierarchy**
   "Use simplified task structure: campaign → fix task → bug subtasks. Bugs tracked in Gitea Issues with detailed lifecycle, subtasks for work items."
