@@ -500,21 +500,27 @@ Registry-driven `.claude/project.json` generation:
 **Goal**: Establish project structure and core infrastructure
 
 **Recommended Subagents**:
-- `git-workflow-manager`: Repository setup, submodule management, workflow design
 - `mcp-developer`: MCP protocol analysis, Qdrant MCP integration, custom MCP development  
 - `research-analyst`: claude-context codebase investigation, feasibility analysis
 
-1. **Project Initialization**:
-   - Initialize main project repository structure (`git-workflow-manager`)
-   - Create GitHub repos for submodules (claude-capabilities, qa-engine, ingest-web-mcp)
-   - Set up submodule references and development structure
-
-2. **Core Infrastructure Investigation**:
-   - **CRITICAL**: Investigate claude-context Milvus → Qdrant migration feasibility (`research-analyst` + `mcp-developer`)
+1. **Qdrant MCP Investigation**:
    - Analyze existing Qdrant MCP capabilities and compatibility (`mcp-developer`)
-   - Establish Qdrant as unified vector store if possible
+   - Establish Qdrant as unified vector store foundation
 
-3. **Base MCP Stack**:
+2. **De-dockerization Opportunities**:
+   - Identify components that can be simplified from Docker to native installation
+   - Evaluate performance and maintenance benefits
+
+3. **Claude-context Migration Investigation**:
+   - **CRITICAL**: Investigate claude-context Milvus → Qdrant migration feasibility (`research-analyst` + `mcp-developer`)
+   - Assess technical challenges and compatibility requirements
+
+4. **Task-master Internal Architecture Analysis**:
+   - Deep dive into Task-master source code and internal strategies (`research-analyst`)
+   - Investigate how Task-master leverages Claude Code for task execution
+   - **Key Question**: Does Task-master use subagents for PRD-to-task parsing, and if so, what patterns can be adopted?
+
+5. **Base MCP Stack**:
    - Deploy Qdrant + Qdrant-MCP for project memory (`mcp-developer`)
    - Enhanced Sequential-Thinking → Task-master integration
    - Wire Serena to Task-master (execution only)
