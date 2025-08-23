@@ -13,3 +13,6 @@
 [submodule "mcp/qa-engine-mcp"]
 	path = mcp/qa-engine-mcp
 	url = https://github.com/ChrisGVE/claude-code-qa-engine.git
+[submodule "mcp/localdata-mcp"]
+	path = mcp/localdata-mcp
+	url = git@github.com:ChrisGVE/localdata-mcp.git
