@@ -462,16 +462,68 @@ Registry-driven `.claude/project.json` generation:
 - Automated GitHub issue mirroring from Task-master.
 - UI/dashboard for monitoring tasks + memory + QA results.
 
-# Logical Dependency Chain
+# Development Phases
 
-1. Establish Task-master as central authority.
-2. Connect Sequential-Thinking → Task-master.
-3. Wire Serena to Task-master (execution only).
-4. Keep Claude-Context self-contained with Milvus + Ollama.
-5. Deploy Qdrant + Qdrant-MCP, adapt ingest-web.
-6. Implement project bootstrap config generator.
-7. Add QA Engine MCP pipeline.
-8. Add optional MCPs as per project profiles.
+## Phase 1: Project Foundation & Infrastructure Setup
+**Goal**: Establish project structure and core infrastructure
+
+1. **Project Initialization**:
+   - Initialize main project repository structure
+   - Create GitHub repos for submodules (claude-capabilities, qa-engine, ingest-web-mcp)
+   - Set up submodule references and development structure
+
+2. **Core Infrastructure Investigation**:
+   - **CRITICAL**: Investigate claude-context Milvus → Qdrant migration feasibility
+   - Analyze existing Qdrant MCP capabilities and compatibility
+   - Establish Qdrant as unified vector store if possible
+
+3. **Base MCP Stack**:
+   - Deploy Qdrant + Qdrant-MCP for project memory
+   - Enhanced Sequential-Thinking → Task-master integration
+   - Wire Serena to Task-master (execution only)
+
+## Phase 2: Memory & Research Enhancement
+**Goal**: Add project memory and web research capabilities
+
+1. **Memory System**:
+   - Per-project Qdrant collections
+   - Project-specific memory schemas and contracts
+
+2. **Research Integration**:
+   - Adapt ingest-web-mcp for Qdrant integration
+   - SearxNG setup and integration
+   - Web content ingestion pipeline
+
+## Phase 3: Capability Management System
+**Goal**: Dynamic MCP and agent management
+
+1. **claude-capabilities MCP Development**:
+   - Investigate task-master codebase patterns
+   - Build capability detection and deployment system
+   - Registry-driven project bootstrap
+
+2. **Agent Ecosystem Foundation**:
+   - Project-specific subagent deployment
+   - Phase-based agent activation
+
+## Phase 4: QA Orchestration & Testing
+**Goal**: Sophisticated testing workflows
+
+1. **QA Engine MCP**:
+   - Temporal workflow orchestration
+   - Campaign-based testing system
+
+2. **QA Infrastructure**:
+   - Gitea + Kiwi TCMS + ReportPortal integration
+   - Bug lifecycle management
+
+## Phase 5: Advanced Agent Integration
+**Goal**: Community agent ecosystem
+
+1. **Agent Customization Pipeline**:
+   - 100+ community agent integration
+   - Automated agent adaptation system
+   - Advanced registry features
 
 # Risks and Mitigations
 
