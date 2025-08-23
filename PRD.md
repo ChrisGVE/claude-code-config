@@ -464,66 +464,122 @@ Registry-driven `.claude/project.json` generation:
 
 # Development Phases
 
+## Subagent Mapping Summary
+
+**From `awesome-claude-code-subagents` collection:**
+
+**Phase 1 (Immediate):**
+- `git-workflow-manager` (06-developer-experience) - Repository structure, submodule setup
+- `mcp-developer` (06-developer-experience) - MCP protocol, Qdrant integration  
+- `research-analyst` (10-research-analysis) - claude-context investigation
+
+**Phase 2:**
+- `data-engineer` (05-data-ai) - Pipeline architecture, ingestion systems
+- `mcp-developer` (reuse) - ingest-web-mcp adaptation
+
+**Phase 3:**
+- `research-analyst` (reuse) - task-master codebase analysis
+- `mcp-developer` (reuse) - claude-capabilities MCP development
+- `python-pro` (02-language-specialists) - Python automation, SDK integration
+
+**Phase 4:**
+- `qa-expert` (04-quality-security) - Test strategy, campaign design
+- `mcp-developer` (reuse) - QA Engine MCP development
+- `devops-engineer` (03-infrastructure) - QA infrastructure deployment
+
+**Phase 5:**
+- `prompt-engineer` (05-data-ai) - Agent customization, adaptation
+- `python-pro` (reuse) - Automation pipeline
+- `mcp-developer` (reuse) - Integration patterns
+
+**Total Unique Agents Needed: 7**
+- Core: `mcp-developer` (used across all phases)
+- Specialized: `git-workflow-manager`, `research-analyst`, `data-engineer`, `python-pro`, `qa-expert`, `devops-engineer`
+
 ## Phase 1: Project Foundation & Infrastructure Setup
 **Goal**: Establish project structure and core infrastructure
 
+**Recommended Subagents**:
+- `git-workflow-manager`: Repository setup, submodule management, workflow design
+- `mcp-developer`: MCP protocol analysis, Qdrant MCP integration, custom MCP development  
+- `research-analyst`: claude-context codebase investigation, feasibility analysis
+
 1. **Project Initialization**:
-   - Initialize main project repository structure
+   - Initialize main project repository structure (`git-workflow-manager`)
    - Create GitHub repos for submodules (claude-capabilities, qa-engine, ingest-web-mcp)
    - Set up submodule references and development structure
 
 2. **Core Infrastructure Investigation**:
-   - **CRITICAL**: Investigate claude-context Milvus → Qdrant migration feasibility
-   - Analyze existing Qdrant MCP capabilities and compatibility
+   - **CRITICAL**: Investigate claude-context Milvus → Qdrant migration feasibility (`research-analyst` + `mcp-developer`)
+   - Analyze existing Qdrant MCP capabilities and compatibility (`mcp-developer`)
    - Establish Qdrant as unified vector store if possible
 
 3. **Base MCP Stack**:
-   - Deploy Qdrant + Qdrant-MCP for project memory
+   - Deploy Qdrant + Qdrant-MCP for project memory (`mcp-developer`)
    - Enhanced Sequential-Thinking → Task-master integration
    - Wire Serena to Task-master (execution only)
 
 ## Phase 2: Memory & Research Enhancement
 **Goal**: Add project memory and web research capabilities
 
+**Recommended Subagents**:
+- `data-engineer`: Pipeline architecture, ETL design, ingestion optimization
+- `mcp-developer`: ingest-web-mcp adaptation, integration patterns
+
 1. **Memory System**:
-   - Per-project Qdrant collections
+   - Per-project Qdrant collections (`data-engineer`)
    - Project-specific memory schemas and contracts
 
 2. **Research Integration**:
-   - Adapt ingest-web-mcp for Qdrant integration
-   - SearxNG setup and integration
-   - Web content ingestion pipeline
+   - Adapt ingest-web-mcp for Qdrant integration (`mcp-developer` + `data-engineer`)
+   - SearxNG setup and integration (`data-engineer`)
+   - Web content ingestion pipeline (`data-engineer`)
 
 ## Phase 3: Capability Management System
 **Goal**: Dynamic MCP and agent management
 
+**Recommended Subagents**:
+- `research-analyst`: task-master codebase analysis, pattern identification
+- `mcp-developer`: claude-capabilities MCP development, protocol implementation
+- `python-pro`: Python SDK integration, automation scripts
+
 1. **claude-capabilities MCP Development**:
-   - Investigate task-master codebase patterns
-   - Build capability detection and deployment system
-   - Registry-driven project bootstrap
+   - Investigate task-master codebase patterns (`research-analyst`)
+   - Build capability detection and deployment system (`mcp-developer`)
+   - Registry-driven project bootstrap (`python-pro`)
 
 2. **Agent Ecosystem Foundation**:
-   - Project-specific subagent deployment
+   - Project-specific subagent deployment (`mcp-developer`)
    - Phase-based agent activation
 
 ## Phase 4: QA Orchestration & Testing
 **Goal**: Sophisticated testing workflows
 
+**Recommended Subagents**:
+- `qa-expert`: Test strategy design, campaign planning, quality metrics
+- `mcp-developer`: QA Engine MCP development, Temporal integration
+- `devops-engineer`: QA infrastructure setup, service orchestration
+
 1. **QA Engine MCP**:
-   - Temporal workflow orchestration
-   - Campaign-based testing system
+   - Temporal workflow orchestration (`mcp-developer`)
+   - Campaign-based testing system (`qa-expert`)
 
 2. **QA Infrastructure**:
-   - Gitea + Kiwi TCMS + ReportPortal integration
-   - Bug lifecycle management
+   - Gitea + Kiwi TCMS + ReportPortal integration (`devops-engineer`)
+   - Bug lifecycle management (`qa-expert`)
 
 ## Phase 5: Advanced Agent Integration
 **Goal**: Community agent ecosystem
 
+**Recommended Subagents**:
+- `prompt-engineer`: Agent customization, adaptation strategies
+- `python-pro`: Automation pipeline, registry management
+- `mcp-developer`: MCP dependency resolution, integration patterns
+
 1. **Agent Customization Pipeline**:
-   - 100+ community agent integration
-   - Automated agent adaptation system
-   - Advanced registry features
+   - 100+ community agent integration (`prompt-engineer`)
+   - Automated agent adaptation system (`python-pro`)
+   - Advanced registry features (`mcp-developer`)
 
 # Risks and Mitigations
 
