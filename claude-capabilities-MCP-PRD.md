@@ -234,10 +234,18 @@ def step3_taskmaster_initialization(project_root: Path, prd_file: str) -> Initia
 
 **Completion**: All initialization complete, user has control with task-master and full capability system operational
 
-**Research Dependencies**:
-- Task-master integration approach (CLI/MCP-to-MCP/direct)
-- Capability storage and retrieval mechanism  
+**Research Dependencies** (Phase 1 Investigation):
+
+**Task-master Integration Approach** (4-part investigation):
+- **3.1 Strategy & Implementation Analysis**: Understand Task-master architecture and MCP server logic
+- **3.2 MCP Inter-Server Communication**: Research if MCP standard supports server-to-server communication  
+- **3.3 Direct Integration**: Evaluate JavaScript integration with CI monitoring for breaking changes
+- **3.4 Python-JavaScript Shims**: Explore bridge solutions between Python and JavaScript
+
+**Additional Dependencies**:
+- Capability storage and retrieval mechanism (depends on chosen task-master integration)
 - Dynamic capability deployment on task transitions
+- Claude Code SDK capabilities (context clearing, prompt injection)
 
 ## **STEP 2: Project Planning & Task Generation Phase**
 
