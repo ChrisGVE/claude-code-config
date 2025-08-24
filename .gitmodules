@@ -22,3 +22,6 @@
 [submodule "resources/wshobson-agents"]
 	path = resources/wshobson-agents
 	url = https://github.com/wshobson/agents.git
+[submodule "resources/iannuttall-agents"]
+	path = resources/iannuttall-agents
+	url = https://github.com/iannuttall/claude-agents.git
