@@ -52,3 +52,6 @@
 [submodule "resources/claude-code-hooks-multi-agent-observability"]
 	path = resources/claude-code-hooks-multi-agent-observability
 	url = https://github.com/disler/claude-code-hooks-multi-agent-observability.git
+[submodule "resources/sirmalloc-statusline"]
+	path = resources/sirmalloc-statusline
+	url = https://github.com/sirmalloc/ccstatusline.git
