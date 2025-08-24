@@ -25,3 +25,6 @@
 [submodule "resources/iannuttall-agents"]
 	path = resources/iannuttall-agents
 	url = https://github.com/iannuttall/claude-agents.git
+[submodule "resources/zhsama-claude-workflow"]
+	path = resources/zhsama-claude-workflow
+	url = https://github.com/zhsama/claude-sub-agent.git
