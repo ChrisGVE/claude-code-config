@@ -46,3 +46,6 @@
 [submodule "resources/webdevtodayjason-hooks"]
 	path = resources/webdevtodayjason-hooks
 	url = https://github.com/webdevtodayjason/claude-hooks.git
+[submodule "resources/decider-hooks"]
+	path = resources/decider-hooks
+	url = https://github.com/decider/claude-hooks.git
