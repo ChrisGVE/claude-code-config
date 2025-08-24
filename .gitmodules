@@ -1,8 +1,8 @@
-[submodule "subagent-example-script"]
-	path = subagent-example-script
+[submodule "resources/subagent-example-script"]
+	path = resources/subagent-example-script
 	url = https://github.com/derek-opdee/subagent-example-script.git
-[submodule "awesome-claude-code-subagents"]
-	path = awesome-claude-code-subagents
+[submodule "resources/awesome-claude-code-subagents"]
+	path = resources/awesome-claude-code-subagents
 	url = https://github.com/VoltAgent/awesome-claude-code-subagents.git
 [submodule "mcp/ingest-web-mcp"]
 	path = mcp/ingest-web-mcp
