@@ -21,6 +21,11 @@ The claude-capabilities MCP is a specialized MCP server that handles dynamic cap
 - **Python-based**: Built using claude-code-sdk
 - **Dual-mode**: Functions as both stdio MCP server AND standalone CLI tool
 - **Registry-driven**: Uses `resources/registry.yaml` for capability mapping
+- **CLAUDE.md Templates**: Multiple specialized templates for workflow phases:
+  - `CLAUDE.md.bootstrap` - Initial project setup
+  - `CLAUDE.md.step2` - PRD refinement with agent integration
+  - `CLAUDE.md.production` - Main execution environment
+  - Templates tightly integrated with claude-capabilities MCP implementation
 
 ## Technical Specifications
 
