@@ -54,8 +54,8 @@ The project is defined in three parts:
 - **Specialized Subagents**: Project-specific agents deployed based on capabilities (e.g., Rust expert, React specialist)
 
 **Specialized MCPs**:
-- **Claude Debugger MCP**: Detailed specifications in [`claude-debugger-MCP-PRD.md`](./claude-debugger-MCP-PRD.md)
-- **Ingest-web MCP Modifications**: Detailed specifications in [`ingest-web-modifications-PRD.md`](./ingest-web-modifications-PRD.md)
+- **Claude Debugger MCP**: Detailed specifications in [`mcp/claude-debugger/PRD.md`](./mcp/claude-debugger/PRD.md)
+- **Ingest-web MCP Modifications**: Detailed specifications in [`mcp/ingest-web-mcp/PRD.md`](./mcp/ingest-web-mcp/PRD.md)
 
 **Registry-Based Deployment**:
 - Project-specific subagents are deployed during planning phases via registry-based selection.
@@ -1084,7 +1084,7 @@ for h in hits:
 3. Create task plan in task-master
 4. Final task: "Plan testing campaign, confirm with user, update task-master"
 
-**claude-capability-manager MCP**: Detailed specifications in [`claude-capability-manager-MCP-PRD.md`](./claude-capability-manager-MCP-PRD.md)
+**claude-capability-manager MCP**: Detailed specifications in [`mcp/claude-capability-manager/PRD.md`](./mcp/claude-capability-manager/PRD.md)
 
 ## Task-Capability Binding Architecture
 

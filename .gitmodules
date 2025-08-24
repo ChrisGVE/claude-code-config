@@ -7,11 +7,11 @@
 [submodule "mcp/ingest-web-mcp"]
 	path = mcp/ingest-web-mcp
 	url = https://github.com/ChrisGVE/claude-code-ingest-web.git
-[submodule "mcp/claude-capabilities-mcp"]
-	path = mcp/claude-capabilities-mcp
+[submodule "mcp/claude-capability-manager"]
+	path = mcp/claude-capability-manager
 	url = https://github.com/ChrisGVE/claude-code-capabilities.git
-[submodule "mcp/qa-engine-mcp"]
-	path = mcp/qa-engine-mcp
+[submodule "mcp/claude-debugger"]
+	path = mcp/claude-debugger
 	url = https://github.com/ChrisGVE/claude-code-qa-engine.git
 [submodule "mcp/localdata-mcp"]
 	path = mcp/localdata-mcp
