@@ -67,3 +67,6 @@
 [submodule "resources/Ido-Levi-statusline"]
 	path = resources/Ido-Levi-statusline
 	url = https://github.com/Ido-Levi/claude-code-tamagotchi.git
+[submodule "resources/Owloops-statusline-powerline"]
+	path = resources/Owloops-statusline-powerline
+	url = https://github.com/Owloops/claude-powerline.git
