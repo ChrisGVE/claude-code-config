@@ -19,3 +19,6 @@
 [submodule "resources/subagent-example-script"]
 	path = resources/subagent-example-script
 	url = https://github.com/derek-opdee/subagent-example-script.git
+[submodule "resources/wshobson-agents"]
+	path = resources/wshobson-agents
+	url = https://github.com/wshobson/agents.git
