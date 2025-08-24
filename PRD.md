@@ -15,16 +15,26 @@ The project is defined in three parts:
 ## Task Management
 
 - **Task-master** is the **source of truth for all tasks**.
-- **Sequential-Thinking** creates task DAGs from PRDs and persists them to Task-master.
-- **Serena** executes development tasks (build, fix, refactor), updates statuses, and reports back to Task-master. Serena delegates QA tasks to QA Engine MCP.
-- **QA Engine MCP** handles all testing tasks via self-contained workflow orchestration, creates bug fix tasks in Task-master.
-- **GitHub MCP** is used only for repo management (creation, linking to project, and optional issue mirroring).
+
+**Task Creation Authority (Hierarchical)**:
+- **Sequential-Thinking**: Creates initial task DAGs from PRDs (bootstrap only)
+- **QA Engine MCP**: Creates bug fix tasks and subtasks when tests fail (QA workflow only)
+- **Planner Subagent**: Updates task structure during PRD revisions (planning phases only)
+
+**Task Execution Architecture**:
+- **Claude Code** acts as **supervisor**, orchestrating subagents for all development work
+- **Development Subagents** handle specific tasks (build, fix, refactor, test) under Claude Code supervision
+- **Claude Code** updates task statuses in Task-master and coordinates with QA Engine MCP
+- **QA Engine MCP** handles all testing workflows via self-contained orchestration
+- **GitHub MCP** is used only for repo management (creation, linking to project, and optional issue mirroring)
 
 ## Codebase Context
 
 - **Claude-Context-MCP** provides semantic and structural codebase retrieval.
 - Embedding: handled locally with Ollama (nomic-embed-text).
-- DB backend: Milvus (self-contained with Claude-Context). Serena queries Claude-Context for code context, never reindexes code itself.
+- DB backend: **Milvus (dedicated to claude-context only)** - self-contained with Claude-Context. 
+- **Architectural Decision**: Milvus and Qdrant operate as separate, specialized vector stores due to claude-context's Milvus dependency and Qdrant's superior ingestion performance and recall for project memory.
+- **Claude Code** and **development subagents** query Claude-Context for code context, never reindex code themselves.
 
 ## Project Memory
 
@@ -35,16 +45,27 @@ The project is defined in three parts:
 
 ## Subagents
 
-- **Planner Subagent**: handles PRD → task DAG conversion, writes to Task-master only. Active during bootstrap and PRD revision phases.
-- **Architect Subagent**: manages architectural decisions and ADRs, stores summaries in Qdrant. Active during bootstrap and architectural planning phases.
-- **QA Engine MCP**: specialized MCP for testing workflows, uses Temporal for durable orchestration.
+**On-Demand Subagents (Deployed Based on Phase/Needs)**:
+- **Planner Subagent**: handles PRD → task DAG conversion, writes to Task-master only. Deployed during bootstrap and PRD revision phases.
+- **Architect Subagent**: manages architectural decisions and ADRs, stores summaries in Qdrant. Deployed during bootstrap and architectural planning phases.
+- **Development Subagents**: Handle build, fix, refactor, and implementation tasks under Claude Code orchestration
+  - Backend Engineer, Frontend Engineer, Full Stack Developer (overlapping but clearly delineated roles)
+  - Testing Specialists, Debugging Specialists
+- **Specialized Subagents**: Project-specific agents deployed based on capabilities (e.g., Rust expert, React specialist)
+
+**Specialized MCPs**:
+- **QA Engine MCP**: Detailed specifications in [`qa-engine-MCP-PRD.md`](./qa-engine-MCP-PRD.md)
+- **Ingest-web MCP Modifications**: Detailed specifications in [`ingest-web-modifications-PRD.md`](./ingest-web-modifications-PRD.md)
+
+**Registry-Based Deployment**:
 - Project-specific subagents are deployed during planning phases via registry-based selection.
 
 ## Project Profiles
 
 - Each project has a `.claude/project.json` config generated at bootstrap via registry-based tool selection.
-- Always-on MCPs: Task-master, Time, GitHub, Qdrant, Claude-Context.
-- Optional MCPs enabled per project via signals from PRD:
+- **Always-on MCPs**: Task-master, Time, GitHub, Qdrant, Claude-Context, Sequential-Thinking.
+- **On-Demand Subagents**: All subagents deployed based on project phase and capability needs (no permanent subagents).
+- **Optional MCPs** enabled per project via capabilities from PRD:
   - `corrode` (Rust-specific projects)
   - `ios-simulator-mcp` (iOS/iPadOS projects)
   - `mermaid` (diagrams/doc-heavy projects)
@@ -52,17 +73,24 @@ The project is defined in three parts:
   - `container-use` (devops/testing needs)
   - `qa-mcp` (custom QA orchestration)
 
-- Sequential-Thinking is enabled when planning subtasks.
-- **Registry-driven deployment**: MCP and subagent selection based on project signals with GitHub Actions compatibility.
+- **Registry-driven deployment**: MCP and subagent selection based on project capabilities with GitHub Actions compatibility.
+- **Claude Code Orchestration**: Supervises all development subagents via parallel execution, coordinates task execution, manages handoffs to QA Engine MCP.
+- **Lifecycle Management**: All subagents deployed on-demand, no permanent agents, Claude manages parallel execution naturally.
 
 ## MCP & Subagent Registry
 
 **Tool Selection Strategy:**
-- Registry file maps project signals → required MCPs and subagents
-- Bootstrap script infers signals from PRD (stack, targets, ui_focus, etc.)
+- Registry file maps project capabilities → required MCPs and subagents
+- Bootstrap script infers capabilities from PRD (stack, targets, ui_focus, etc.)
 - Preference for global tool installation (`uv tool install`, `npm install -g`) over Docker
 - All MCPs maintained as thin interface layers over underlying systems
-- Regular update scheduling via batch scripts
+
+**Registry Management Philosophy:**
+- **Latest Versions**: Always use latest MCP versions - no version pinning
+- **Graceful Degradation**: Failed MCPs don't block Claude startup, continue with available tools
+- **Capability Standardization**: Prevent overlapping tools (e.g., Playwright over Puppeteer)
+- **Break-Fix Approach**: When ecosystem changes break MCPs, fix and continue
+- **Maintenance Acceptance**: Registry updates are normal operational overhead
 
 **File Structure:**
 ```
@@ -85,22 +113,39 @@ The project is defined in three parts:
 mcps:
   qa-mcp:
     name: "qa-mcp"
-    signals: ["testing", "qa", "e2e"]
-    integration: "qa-mcp --port 8080"
+    capabilities: ["testing", "qa", "e2e"]
+    integration: "qa-mcp --port 8082"
   corrode:
     name: "corrode"
-    signals: ["rust", "cargo.toml"]
+    capabilities: ["rust", "cargo.toml"]
     integration: "corrode-mcp"
+  playwright-mcp:
+    name: "playwright-mcp"
+    capabilities: ["web-automation", "e2e-testing", "browser-control"]
+    integration: "playwright-mcp"
+    replaces: ["puppeteer-mcp", "selenium-mcp", "browser-automation-mcp"]
 
 subagents:
   planner:
-    signals: ["planning", "prd_work"]
+    capabilities: ["planning", "prd_work"]
     source: "agents/planner.md"
-    phase: "bootstrap"
+    phases: ["bootstrap", "prd_revision"]
+    deployment: "on-demand"
   architect:
-    signals: ["architecture", "prd_work"]
+    capabilities: ["architecture", "prd_work"]
     source: "agents/architect.md"
-    phase: "bootstrap"
+    phases: ["bootstrap", "architecture_planning"]
+    deployment: "on-demand"
+  backend-engineer:
+    capabilities: ["backend", "api", "database"]
+    source: "agents/backend-engineer.md"
+    phases: ["development", "implementation"]
+    deployment: "on-demand"
+  frontend-engineer:
+    capabilities: ["frontend", "ui", "ux"]
+    source: "agents/frontend-engineer.md"
+    phases: ["development", "ui_implementation"]
+    deployment: "on-demand"
 
 prompts:
   claude-md:
@@ -116,60 +161,159 @@ folders:
   - ".claude/commands"
 
 files:
+  # Content-defined files (inline content)
   - file: ".claude/settings.json"
     content: "{}"
+  
+  # Source-copied files (copy from source to target)  
+  - file: ".gitignore"
+    source: "/Users/chris/dev/ai/claude-code-cfg/templates/.gitignore.template"
+  
+  - file: "CLAUDE.md"
+    source: "/Users/chris/dev/ai/claude-code-cfg/prompts/CLAUDE.md.template"
+
+workflows:
+  new_project:
+    step: 1
+      name: "Project Scaffolding Setup"
+      description: "Hook up new project with scaffolding infrastructure"
+      task: 1
+        name: "Git Repository Check"
+        git:
+          dirty: yes
+          command: "git commit -am"
+          message: "Committing staged files before setting up project"
+      task: 2
+        name: "CLAUDE.md Backup"
+        file:
+          source: "CLAUDE.md"
+          target: "CLAUDE.md.backup"
+          condition: "if_exists"
+      task: 3
+        name: "Folder and File Creation" 
+        directory: ".claude/agents/"
+        directory: ".claude/hooks/"
+        directory: ".claude/commands/"
+        file:
+          source: "templates/registry.template.yaml"
+          target: ".claude/registry.yaml"
+        file:
+          source: "templates/task-master.config.json"
+          target: ".claude/task-master.config.json"
+        file:
+          source: "prompts/CLAUDE.md.step2"
+          target: "CLAUDE.md"
+      task: 4
+        name: "Project Registry Population"
+        project_registry:
+          action: "sync"
+      task: 5
+        name: "Agent Installation"
+        project_registry:
+          action: "deploy_agent"
+          agent_name: "planner"
 
 claude-integration:
   command: "claude mcp add {name} -- {integration}"
 ```
 
+## Registry Workflow Syntax
+
+**Structure:** `workflows: <workflow_name>: step: N task: N`
+- Each step and task includes `name:` and `description:` for maintainability and user messaging
+
+**Operation Types:**
+
+**File Operations:**
+- `file:` with `source:` (relative to global registry) and `target:` (relative to project root)
+- Optional `condition:` for conditional operations
+
+**Directory Operations:**
+- `directory:` (folder relative to project root, uses `mkdir -p` for nested creation)
+
+**Git Operations:**
+- `git:` with optional `dirty:` condition:
+  - `dirty: yes` → execute if unstaged files exist
+  - `dirty: no` → execute if no unstaged files  
+  - No `dirty:` → unconditional execution
+- `command:` (e.g., `git commit -am`)
+- `message:` (optional, automatically appended in quotes)
+
+**Project Registry Operations:**
+- `project_registry:` with `action:`
+  - `sync` → synchronize project registry with installed agents/MCPs
+  - `deploy_agent` with `agent_name:`
+  - Future: `deploy_mcp`, `undeploy_agent`, `undeploy_mcp`
+
 **Bootstrap Workflow:**
 
-**Phase 1: Project Declaration & Bootstrap Setup**
-```
-User declares: "New project" OR "Upgrade existing project"
-Claude (via system prompt):
-- Copy CLAUDE.md.bootstrap → PROJECT_ROOT/CLAUDE.md
-- Instruct user: "/clear context and restart"
-```
+## New Project Workflow (Path A)
 
-**Phase 2: Context Restart with Bootstrap Template**
-```
-New Project: PRD creation → Bootstrap MCP → Task planning
-Existing Project: Code exploration → Qdrant review → PRD review → Bootstrap MCP → Task planning
-```
+**Workflow Trigger:**
+- User declares new project with PRD location (draft or template)
+- System prompt triggers claude-capabilities MCP with:
+  - PRD file location
+  - Project type indicator: `new_project`
 
-**Phase 3: claude-capabilities MCP Operations**
-1. Parse registry.yaml based on PRD signals
-2. Create folders (`.claude/agents/`, `.claude/hooks/`, `.claude/commands/`)
-3. Create files (`.claude/settings.json` with `{}`)
-4. Copy prompts (`CLAUDE.md.template` → `CLAUDE.md`, etc.)
-5. Deploy matching subagents to `.claude/agents/`
-6. Execute `claude mcp add {name} -- {integration}` for matching MCPs
-7. Initialize project with task-master, claude-context, serena
+**Step 1: Project Scaffolding Setup**
+*Purpose: Hook up new project with scaffolding infrastructure (no configuration yet)*
+
+- **Task 1 - Git Repository Check:**
+  - Check if repository initialized
+  - If yes: check for staged files
+  - If staged files exist: commit with message "Committing staged files before setting up project"
+  - If no repository: skip task
+
+- **Task 2 - CLAUDE.md Backup:**
+  - Check existence of CLAUDE.md
+  - If exists: backup as CLAUDE.md.backup (preserve user's existing configuration)
+
+- **Task 3 - Folder and File Creation:**
+  - Create required folder structure via global registry
+  - Create files: registry template, task-master standard configuration
+  - Copy special version of system prompt into CLAUDE.md (prepare for Step 2)
+
+- **Task 4 - Project Registry Population:**
+  - Populate project registry with agents already installed in `.claude/agents/`
+  - Check existing project MCPs from `.claude.json`
+
+- **Task 5 - Agent Installation:**
+  - Install necessary agents (defined in global registry workflows section)
+  - Hook agents up to project registry
+
+**Step 2: [To be defined]**
+
+**Step 3: [To be defined]**
 
 # User Experience
 
-- **Project Bootstrap Flow**:
-  1. User creates repo and adds `PRD.txt`.
-  2. Run `project_bootstrap.py`, which:
-     - Calls Task-master to ingest PRD.
-     - Infers signals (stack, targets, ui_focus, diagrams, etc.).
-     - Generates `.claude/project.json` enabling only relevant MCPs and linking subagents.
-     - Prepares Qdrant collection for project memory and seeds PRD summary.
-
-  3. Sequential-Thinking generates initial tasks → Task-master.
-  4. Serena executes ready tasks, querying Claude-Context for code and Qdrant for project memory.
-  5. QA Engine MCP validates outputs at each phase and ensures feedback loops.
+- **New Project Bootstrap Flow**:
+  1. User declares new project with PRD location (draft or template)
+  2. System prompt triggers claude-capabilities MCP with PRD location + `new_project` indicator
+  3. **Step 1 - Project Scaffolding Setup**: claude-capabilities MCP executes registry-defined workflow:
+     - Git repository check and cleanup
+     - CLAUDE.md backup (preserve existing user configuration)
+     - Folder structure creation (.claude/agents/, .claude/hooks/, etc.)
+     - File creation (registry template, task-master config, Step 2 system prompt)
+     - Project registry population and agent installation
+  4. **Step 2**: [To be defined - initial configuration]
+  5. **Step 3**: [To be defined - task planning and execution setup]
 
 - **Context Management**:
-  - Serena and subagents fetch **summaries first** from Qdrant.
+  - Claude Code and development subagents fetch **summaries first** from Qdrant.
   - Claude-Context provides repo snippets directly.
   - Hydration of full content is explicit, preventing context bloat.
 
 # Technical Architecture
 
 ## Authoritative Data Contracts
+
+**Data Contract Evolution:**
+- **Tool-Native Migration**: Each tool (Task-master, Qdrant) handles its own schema evolution
+- **No Backward Compatibility Requirements**: Accept breaking changes as tools mature
+- **Schema Enhancement Welcome**: Embrace beneficial changes (e.g., Task-master assignee field for agent pre-assignment)
+- **JSON Flexibility**: Task-master's JSON format naturally accommodates schema changes
+- **Mature Tool Stability**: Qdrant schema changes expected to be infrequent due to tool maturity
 
 ### Tasks (Task-master / authoritative schema)
 
@@ -218,7 +362,7 @@ The Qdrant MCP requires you to define the payload used by `qdrant-store`/`qdrant
 
 **Vector space**
 
-- 384‑d (FastEmbed MiniLM‑L6‑v2) when using the Qdrant MCP’s embedder, or 768‑d if ingest writes Ollama vectors. **Collection vector size must match.**
+- **768-d (Ollama nomic-embed-text)** - standardized embedding model across all components. **Collection vector size must match.**
 
 **Collection strategy**
 
@@ -263,118 +407,26 @@ The Qdrant MCP requires you to define the payload used by `qdrant-store`/`qdrant
 3. **Fetch** with retries (`tenacity`).
 4. **Parse** using `trafilatura` (fallback: BeautifulSoup) to extract clean text + title + metadata.
 5. **Summarize** into ≤200 tokens for `summary`; write full body to `content_ref`.
-6. **Embed** via **Ollama** (`nomic-embed-text`) _or_ **FastEmbed**; ensure vector size matches the collection.
+6. **Embed** via **Ollama** (`nomic-embed-text`, 768-d) - standardized across all components.
 7. **Upsert** to Qdrant with the payload contract above.
 
-### QA Architecture (Specialized MCP Model)
+### QA Architecture
 
-**Objective**: Durable, state-as-data QA workflows with clear separation of concerns.
-
-**Architecture Decision:** Specialized QA Engine MCP handles all testing workflows, with Serena focused on development tasks.
-
-**Component Roles:**
-
-- **Task-master**: Source of truth for all tasks (including QA tasks)
-- **Serena**: Executes development tasks, delegates QA tasks to QA Engine MCP, handles bug fixes
-- **QA Engine MCP**: Specialized MCP using Temporal for durable workflow orchestration
-- **QA MCP**: Thin interface layer over Gitea Issues + Kiwi TCMS + ReportPortal + Temporal
-
-**Tool Stack (Self-hosted, GitHub-compatible):**
-
-- **Bug Tracking**: Gitea/Forgejo Issues (GitHub Actions-compatible syntax)
-- **Test Management**: Kiwi TCMS (campaigns, test cases, runs)
-- **Analytics**: ReportPortal (automation results, flaky test detection)
-- **Orchestration**: Temporal (durable workflows, retries, audit history)
-- **Tracing**: Langfuse (token budgets, role drift monitoring)
-- **Execution Tools**: playwright-mcp, container-use, corrode (Rust)
-
-**Simplified Task Hierarchy:**
-
-QA workflows use clean task grouping to separate workflow concerns from detailed bug tracking:
-
-```
-Task 15: Implement feature X
-Task 16: Test campaign for feature X (depends on 15)  
-Task 17: Fix bugs from test campaign 16 (depends on 16, created if bugs found)
-  ├── Subtask 17.1: Fix Bug #101 (links to Gitea Issue #101)
-  ├── Subtask 17.2: Fix Bug #102 (links to Gitea Issue #102)
-  └── Subtask 17.3: Fix Bug #103 (links to Gitea Issue #103)
-Task 18: Regression test after fixes (optional)
-```
-
-**QA MCP Tool Surface (Thin Layer):**
-
-```python
-# Campaign Management (→ Kiwi TCMS)
-qa.create_campaign(task_id, scope, entry_criteria, exit_criteria)
-qa.get_campaign(campaign_id)
-
-# Test Execution (→ ReportPortal + local runners)  
-qa.start_test_run(campaign_id, test_suite)
-qa.record_result(run_id, test_id, status, artifacts)
-
-# Bug Management (→ Gitea Issues)
-qa.create_bug(title, repro_steps, severity, failing_run_id)
-qa.link_bug_to_task(bug_id, task_id)
-
-# Analytics (→ ReportPortal)
-qa.get_flaky_tests(campaign_id)
-qa.get_coverage_trends(project_id)
-
-# Human Approval Gates
-qa.request_approval(campaign_id, approval_type, context)
-```
-
-**State-as-Data Principle:**
-
-All QA state lives in systems, not prompts:
-- **Test campaigns/cases**: Kiwi TCMS (operational)
-- **Test results**: ReportPortal (analytics)
-- **Bugs**: Gitea Issues (detailed lifecycle)
-- **Workflow state**: Temporal (orchestration)
-- **Project context**: Qdrant (summaries, decisions)
-- **Task workflow**: Task-master (high-level progress)
-
-**Workflow Example:**
-
-1. **Serena** completes development Task 15
-2. **Serena** encounters QA Task 16 → delegates to **QA Engine MCP**
-3. **QA Engine MCP** (via Temporal):
-   - Creates test campaign in Kiwi TCMS
-   - Spawns test execution subagents
-   - **If bugs found**: creates bugs in Gitea Issues + Task 17 with subtasks
-   - Marks Task 16 as `done` (campaign complete)
-4. **Serena** handles subtasks 17.1, 17.2, 17.3 (fixes)
-5. **QA Engine MCP** verification: re-runs tests, closes bugs if successful
-
-**Bug Lifecycle Integration:**
-- **Gitea Issues**: Detailed bug states (Open → In Progress → Fixed → Closed)
-- **Task-master Subtasks**: Work items within fix batches
-- **Cross-linking**: `bug:gitea://repo/issues/101` ↔ `task 17.1`
-- **Iteration**: Failed fixes create new subtasks, bugs remain open
-
-**GitHub Compatibility & Updates:**
-- **Gitea Actions**: GitHub Actions-compatible YAML syntax for future migration
-- **CI/CD Integration**: QA orchestrator can trigger/consume GitHub CI results
-- **Update Scheduling**: Batch scripts for regular tool updates (Gitea, Kiwi TCMS, ReportPortal, Temporal)
-
-**Role Contracts & Guardrails:**
-- **QA Engine MCP**: 1-2 sentence mission + allowed QA tools only
-- **Subagents**: Specific roles (test executor, triage analyst) with tool restrictions  
-- **Budget enforcement**: Token/time limits with orchestrator oversight
-- **Human gates**: Required approval for campaign closure, critical bug triage
+**QA Engine MCP**: Complete architecture and workflow specifications in [`qa-engine-MCP-PRD.md`](./qa-engine-MCP-PRD.md)
 
 ## System Components
 
-- **Claude Code**: MCP orchestrator.
+- **Claude Code**: Primary supervisor and orchestrator of all development work via parallel subagent execution.
 - **MCP Servers**: Task-master, Claude-Context, Qdrant, GitHub, Time, Sequential-Thinking, **QA Engine MCP**, and optional project‑specific servers.
-- **Project Subagents**: Planner, Architect (deployed during bootstrap/PRD phases only).
+- **On-Demand Subagents**: All subagents (Planner, Architect, Development specialists) deployed based on project phase and capability needs.
+- **Registry-Based Deployment**: Subagents selected and deployed dynamically from registry based on project capabilities.
 
 ## Infrastructure
 
 **Core Services:**
-- **Milvus**: Claude-Context semantic search (self-contained)
-- **Qdrant**: Project memory (local, Docker)
+- **Milvus**: Claude-Context semantic search (self-contained, dedicated to code context)
+- **Qdrant**: Project memory (local, Docker) - superior ingestion performance and recall for project data
+- **Dual Vector Store Rationale**: Milvus required by claude-context (non-negotiable), Qdrant chosen for project memory due to faster ingestion and higher recall metrics
 - **Ollama**: Embeddings (nomic-embed-text for Claude-Context + ingest-web)
 - **SearxNG**: Search aggregator for ingest-web (local Docker)
 
@@ -385,6 +437,16 @@ All QA state lives in systems, not prompts:
 - **Temporal**: Workflow orchestration (durable, retry logic)
 - **Langfuse**: Agent tracing and evaluation
 
+**Port Allocation (localhost):**
+- **3000**: Gitea/Forgejo
+- **6333/6334**: Qdrant
+- **7233**: Temporal  
+- **8080**: SearxNG
+- **8081**: ReportPortal
+- **8082**: Kiwi TCMS
+- **11434**: Ollama (default)
+- **19530**: Milvus (default)
+
 **Tool Installation Preference:**
 1. **Global tools**: `uv tool install <mcp>` or `npm install -g <mcp>`
 2. **Docker fallback**: For tools requiring complex dependencies
@@ -394,6 +456,31 @@ All QA state lives in systems, not prompts:
 - Gitea Actions uses GitHub Actions YAML syntax
 - Seamless migration path to GitHub workflows
 - CI/CD definitions portable between platforms
+
+## Security Architecture
+
+**Security Philosophy**: High risk tolerance with minimal friction - focus on essential protections only.
+
+**Network Security:**
+- **Localhost Only**: All services bound to localhost, no external exposure
+- **Inbound/Outbound**: External access only from within (ingest-web, git operations)
+
+**Data Protection:**
+- **Project Boundary**: Generally stay within project root directory tree (soft rule with exceptions when needed)
+- **GitHub Protection**: Enhanced `.gitignore` patterns to prevent accidental sensitive data commits
+
+**Web Content Security (ingest-web-mcp):**
+- **URL Filtering**: Block known malicious domains during web scraping
+- **Content Validation**: Basic validation of scraped content before ingestion
+- **Process Isolation**: Web scraping operations run in isolated process/container
+
+**Community Agent Security:**
+- **Agent Files**: Community agents are `.md` files - same security level as system
+- **MCP Servers**: Third-party MCPs evaluated via standard due diligence (adoption, popularity, active development)
+
+**Resource Management:**
+- **Monitoring Approach**: Monitor resource usage over time, adjust limits as needed
+- **No Preemptive Limits**: Avoid friction until actual abuse patterns emerge
 
 ### Qdrant runtime (Docker)
 
@@ -418,7 +505,7 @@ Registry-driven `.claude/project.json` generation:
       "env": {
         "QDRANT_URL": "http://localhost:6333",
         "COLLECTION_NAME": "pm_<project-slug>",
-        "EMBEDDING_MODEL": "sentence-transformers/all-MiniLM-L6-v2"
+        "EMBEDDING_MODEL": "nomic-embed-text"
       }
     },
     "claude-context": { "command": "claude-context-mcp" },
@@ -428,15 +515,23 @@ Registry-driven `.claude/project.json` generation:
       "command": "qa-mcp",
       "env": {
         "GITEA_URL": "http://localhost:3000",
-        "KIWI_TCMS_URL": "http://localhost:8080",
+        "KIWI_TCMS_URL": "http://localhost:8082",
         "REPORTPORTAL_URL": "http://localhost:8081",
         "TEMPORAL_URL": "localhost:7233"
       }
     }
   },
   "subagents": {
-    "planner": { "path": ".claude/agents/planner.md", "phase": "bootstrap" },
-    "architect": { "path": ".claude/agents/architect.md", "phase": "bootstrap" }
+    "planner": { "path": ".claude/agents/planner.md", "phases": ["bootstrap", "prd_revision"], "deployment": "on-demand" },
+    "architect": { "path": ".claude/agents/architect.md", "phases": ["bootstrap", "architecture_planning"], "deployment": "on-demand" }
+  },
+  "bootstrap": {
+    "status": "complete",
+    "version": "1.0",
+    "completed_steps": [1,2,3,4,5,6,7,8,9,10],
+    "completed_at": "2025-01-23T10:30:00Z",
+    "rollback_available": true,
+    "backup_path": ".claude/backups/pre-bootstrap.tar.gz"
   }
 }
 ```
@@ -447,7 +542,7 @@ Registry-driven `.claude/project.json` generation:
 
 - Task-master as task authority with simplified QA task hierarchy.
 - Sequential-Thinking → Task-master integration.
-- Serena executes development tasks, delegates QA to QA Engine MCP.
+- Claude Code orchestrates development subagents, delegates QA to QA Engine MCP.
 - QA Engine MCP with Temporal workflows and specialized tool stack.
 - Qdrant integration for project memory, per-project collections.
 - Ingest-web modified to push into Qdrant via SearxNG.
@@ -503,27 +598,43 @@ Registry-driven `.claude/project.json` generation:
 - `mcp-developer`: MCP protocol analysis, Qdrant MCP integration, custom MCP development  
 - `research-analyst`: claude-context codebase investigation, feasibility analysis
 
-1. **Qdrant MCP Investigation**:
-   - Analyze existing Qdrant MCP capabilities and compatibility (`mcp-developer`)
+1. **Qdrant MCP Installation**:
+   - Install and deploy Qdrant + Qdrant-MCP for project memory (`mcp-developer`)
    - Establish Qdrant as unified vector store foundation
+   - Verify integration with Claude Code MCP ecosystem
 
 2. **De-dockerization Opportunities**:
    - Identify components that can be simplified from Docker to native installation
    - Evaluate performance and maintenance benefits
 
-3. **Claude-context Migration Investigation**:
-   - **CRITICAL**: Investigate claude-context Milvus → Qdrant migration feasibility (`research-analyst` + `mcp-developer`)
-   - Assess technical challenges and compatibility requirements
+3. **Task-master Internal Architecture Analysis**:
+   - **NOTE**: Task-master is already deployed and working well - this is analysis only
+   - Deep dive into Task-master CLI commands, API surface, and Claude Code integration patterns (`research-analyst`)
+   - Investigate how Task-master leverages Claude Code for task execution and PRD parsing
+   - **Key Questions**: 
+     - What CLI commands does Task-master support for PRD parsing and task management?
+     - Does Task-master use subagents for PRD-to-task parsing, and if so, what patterns can be adopted?
+     - How does Task-master integrate with Claude Code's context management and MCP systems?
+   - **Goal**: Extract learnings to inform claude-capabilities MCP development
+   - **Memory Storage**: Store all findings in Qdrant with detailed analysis for claude-capabilities MCP design
 
-4. **Task-master Internal Architecture Analysis**:
-   - Deep dive into Task-master source code and internal strategies (`research-analyst`)
-   - Investigate how Task-master leverages Claude Code for task execution
-   - **Key Question**: Does Task-master use subagents for PRD-to-task parsing, and if so, what patterns can be adopted?
+4. **FastMCP Framework Ingestion**:
+   - Ingest and memorize FastMCP Python library documentation (`research-analyst`)
+   - **Source**: https://github.com/jlowin/fastmcp
+   - Store comprehensive API documentation, patterns, and implementation examples in Qdrant
+   - **Goal**: Foundation knowledge for MCP development using FastMCP framework
 
-5. **Base MCP Stack**:
-   - Deploy Qdrant + Qdrant-MCP for project memory (`mcp-developer`)
-   - Enhanced Sequential-Thinking → Task-master integration
-   - Wire Serena to Task-master (execution only)
+5. **Claude Code SDK Ingestion**:
+   - Ingest and memorize Anthropic Claude Code SDK documentation (`research-analyst`)
+   - **Source**: https://docs.anthropic.com/en/docs/claude-code/sdk
+   - Store API references, integration patterns, context management, and MCP lifecycle documentation in Qdrant
+   - **Goal**: Foundation knowledge for Claude Code integration and context management APIs
+
+6. **Task-master CLI Documentation Ingestion**:
+   - Ingest and memorize Task-master CLI commands and integration patterns (`research-analyst`)
+   - **Source**: https://docs.task-master.dev/introduction
+   - Store CLI command reference, PRD parsing capabilities, and task management APIs in Qdrant
+   - **Goal**: Foundation knowledge for Task-master CLI integration in claude-capabilities MCP
 
 ## Phase 2: Memory & Research Enhancement
 **Goal**: Add project memory and web research capabilities
@@ -550,7 +661,7 @@ Registry-driven `.claude/project.json` generation:
 - `python-pro`: Python SDK integration, automation scripts
 
 1. **claude-capabilities MCP Development**:
-   - Investigate task-master codebase patterns (`research-analyst`)
+   - Apply Task-master codebase analysis learnings from Phase 1 (`research-analyst`)
    - Build capability detection and deployment system (`mcp-developer`)
    - Registry-driven project bootstrap (`python-pro`)
 
@@ -589,11 +700,12 @@ Registry-driven `.claude/project.json` generation:
 
 # Risks and Mitigations
 
-- **Overlap between Serena and Task-master** → mitigated by strict role separation (Serena executes only).
+- **Task coordination complexity** → mitigated by Claude Code acting as supervisor with clear subagent orchestration.
 - **Context bloat** → mitigated by summary-first retrieval in Qdrant.
-- **Embedding quality tradeoffs** → default to Ollama nomic-embed-text; test FastEmbed as fallback.
+- **Embedding quality tradeoffs** → standardized on Ollama nomic-embed-text (768-d) across all components.
 - **Complexity in per-project configs** → mitigated with bootstrap script and registry-driven rules.
-- **QA pipeline failures** → mitigated by QA Engine MCP with progressive testing, smart circuit breaking, and container isolation.
+- **QA pipeline failures** → mitigated by QA Engine MCP with progressive testing, smart circuit breaking, container isolation, and operational safeguards.
+- **QA tooling complexity** → accepted tradeoff for preventing Task-master context drift and ensuring campaign completion (validated by experimentation).
 
 # Permanent Subagents Definitions
 
@@ -660,7 +772,7 @@ cfg = {
       "env": {
         "QDRANT_URL": "http://localhost:6333",
         "COLLECTION_NAME": "pm_" + proj_root.name.replace(" ", "-"),
-        "EMBEDDING_MODEL": "sentence-transformers/all-MiniLM-L6-v2"
+        "EMBEDDING_MODEL": "nomic-embed-text"
       }
     },
     "claude-context": {"command": "claude-context-mcp"},
@@ -687,23 +799,26 @@ try:
     try:
         q.get_collection(col)
     except Exception:
-        q.recreate_collection(col, vectors=VectorParams(size=384, distance=Distance.COSINE))
+        q.recreate_collection(col, vectors=VectorParams(size=768, distance=Distance.COSINE))
     print("Qdrant collection ready:", col)
 except Exception as e:
     print("(Optional) qdrant-client not installed:", e)
 ```
 
-## Qdrant Upsert with FastEmbed (384‑d)
+## Qdrant Upsert with Ollama (768-d)
 
 ```python
-from fastembed import TextEmbedding
+import ollama
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import PointStruct
 
 client = QdrantClient(url="http://localhost:6333")
-embed = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
 texts = ["Algorithm draft", "UI design note"]
-vectors = list(embed.embed(texts))
+vectors = []
+for text in texts:
+    response = ollama.embeddings(model="nomic-embed-text", prompt=text)
+    vectors.append(response["embedding"])
+
 points = [
   PointStruct(id=i, vector=vectors[i], payload={"project":"demo","type":"note","stage":"draft"})
   for i in range(len(texts))
@@ -761,25 +876,33 @@ for h in hits:
 5. Confirm complete PRD understanding with user before proceeding
 
 **Phase 2: Context Assessment**
-- New projects: Signal collection only (no Qdrant data expected)
+- New projects: Capability collection only (no Qdrant data expected)
 - Existing projects: Code exploration + tool initialization + Qdrant memory review
-- Collect required capabilities/signals from PRD
+- Collect required capabilities from PRD
 
 **Phase 3: Bootstrap & Planning**
-1. Pass signals to bootstrap MCP for capability installation
+1. Pass capabilities to bootstrap MCP for capability installation
 2. Initialize project with task-master, claude-context, serena
 3. Create task plan in task-master
 4. Final task: "Plan testing campaign, confirm with user, update task-master"
 
-**claude-capabilities MCP Scope:**
-- **Core**: Signal detection + capability installation + project initialization
-- **Extended**: Add new capabilities during development (uplift) + agent customization pipeline
-- **Implementation**: Python-based using claude-code-sdk, dual-mode (stdio MCP + CLI tool)
+**claude-capabilities MCP**: Detailed specifications in [`claude-capabilities-MCP-PRD.md`](./claude-capabilities-MCP-PRD.md)
+
+## Task-Capability Binding Architecture
+
+**Current Status**: Architecture deferred pending Phase 1 Task-master investigation
+
+**Research Questions**:
+- Task-master MCP integration capabilities: https://github.com/eyaltoledano/claude-task-master/blob/main/context/MCP_INTEGRATION.md
+- Canonical task schema validation and extension mechanisms
+- Custom field support vs. structured content in existing fields
+
+**Resolution Path**: Phase 1 Task-master Internal Architecture Analysis will investigate schema flexibility and provide architectural recommendations for storing capability requirements alongside tasks.
 
 # System Prompt Suggestions
 
 - **Task separation**
-  “Serena never creates tasks. Task-master (MCP) is the single authority for task creation and lifecycle. Serena executes only and reports status and artifacts back to Task-master.”
+  "Task creation follows strict hierarchy: Sequential-Thinking (bootstrap), QA Engine MCP (test failures), Planner Subagent (PRD revisions). Claude Code supervises development subagents but never creates tasks - coordinates execution only and reports status back to Task-master."
 
 - **Statuses & dependencies**
   “Use only the canonical statuses: `pending`, `done`, `deferred`. Model blocking exclusively via `dependencies`. Treat work‑in‑progress as `pending` and log progress in `details` with time‑stamped notes.”
@@ -794,7 +917,7 @@ for h in hits:
   “Reference Task IDs (e.g., `8`, `8.1`) in commits, PR titles, Qdrant `related_task_ids`, and ADRs.”
 
 - **Role boundaries**  
-  "Serena: development, fixes, refactoring. QA Engine MCP: testing workflows via Temporal. Clear handoff at QA task delegation."
+  "Claude Code: supervisor and orchestrator. Development Subagents: build, fix, refactor under supervision. QA Engine MCP: testing workflows via Temporal. Clear handoff at QA task delegation."
 
 - **QA workflow hierarchy**
   "Use simplified task structure: campaign → fix task → bug subtasks. Bugs tracked in Gitea Issues with detailed lifecycle, subtasks for work items."
