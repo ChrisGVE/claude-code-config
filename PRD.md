@@ -685,16 +685,37 @@ Registry-driven `.claude/project.json` generation:
    - Identify components that can be simplified from Docker to native installation
    - Evaluate performance and maintenance benefits
 
-3. **Task-master Internal Architecture Analysis**:
+3. **Task-master Integration Investigation** (Expanded into 4 tasks):
    - **NOTE**: Task-master is already deployed and working well - this is analysis only
-   - Deep dive into Task-master CLI commands, API surface, and Claude Code integration patterns (`research-analyst`)
-   - Investigate how Task-master leverages Claude Code for task execution and PRD parsing
-   - **Key Questions**: 
-     - What CLI commands does Task-master support for PRD parsing and task management?
-     - Does Task-master use subagents for PRD-to-task parsing, and if so, what patterns can be adopted?
-     - How does Task-master integrate with Claude Code's context management and MCP systems?
-   - **Goal**: Extract learnings to inform claude-capabilities MCP development
-   - **Memory Storage**: Store all findings in Qdrant with detailed analysis for claude-capabilities MCP design
+   
+   **3.1 Task-master Strategy and Implementation Analysis** (`research-analyst`):
+   - Understanding the strategy behind Task-master architecture
+   - Deep dive into MCP server implementation logic
+   - Analysis of CLI interface and command patterns
+   - Investigation of Claude Code integration patterns
+   - **Goal**: Comprehensive understanding of Task-master's approach
+   
+   **3.2 MCP Standard Inter-Server Communication Research** (`research-analyst`):
+   - Investigate if MCP standard allows direct server-to-server communication
+   - Research MCP protocol for server discovery and communication patterns
+   - Evaluate feasibility of claude-capabilities MCP talking directly to task-master MCP
+   - **Goal**: Determine if MCP-to-MCP communication is possible/standardized
+   
+   **3.3 Direct Integration with Task-master Investigation** (`mcp-developer`):
+   - How to integrate directly with task-master JavaScript codebase
+   - CI setup to detect breaking changes in task-master repository
+   - Unit test strategy to validate integration stability over time
+   - Automated monitoring of task-master repository changes
+   - **Goal**: Direct integration approach evaluation and monitoring strategy
+   
+   **3.4 Python-JavaScript Integration via Shims** (`mcp-developer`):
+   - Explore shim layer between Python (claude-capabilities) and JavaScript (task-master)
+   - Investigate interop patterns and best practices
+   - Evaluate performance and maintenance implications of bridge solutions
+   - Research Node.js/Python bridge solutions and tooling
+   - **Goal**: Determine if shim-based integration is viable approach
+   
+   **Integration Decision**: Phase 1 investigation will resolve task-master integration approach by evaluating CLI, MCP-to-MCP, direct integration, and shim-based approaches
 
 4. **FastMCP Framework Ingestion**:
    - Ingest and memorize FastMCP Python library documentation (`research-analyst`)
