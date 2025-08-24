@@ -52,6 +52,21 @@ def detect_initialization_mode(project_root: Path) -> InitMode:
 
 **Registry-Driven Execution**: All steps and tasks defined in global registry workflows section
 
+#### **Mode B: Existing Project Migration**
+**Scenario**: Existing project with codebase, potentially existing .taskmaster/, PRD, or specs in CLAUDE.md
+**Key Principle**: User-driven workflow selection with minimal detection and maximum workflow reuse
+
+**Trigger**: System prompt triggers claude-capabilities MCP with:
+- Project root location
+- Project type indicator: `existing_project`
+- User-specified entry point from README.md use cases
+
+**User Entry Points**:
+- "Migrate existing project with PRD"
+- "Migrate existing project with task-master already initialized"
+- "Migrate existing project with specs in CLAUDE.md"  
+- "Add capabilities to ongoing task-master project"
+
 #### **Workflow A: Brand New Project Initialization**
 
 **Overview**: Multi-phase iterative workflow with dynamic capability management and task-driven configuration.
@@ -246,6 +261,111 @@ def step3_taskmaster_initialization(project_root: Path, prd_file: str) -> Initia
 - Capability storage and retrieval mechanism (depends on chosen task-master integration)
 - Dynamic capability deployment on task transitions
 - Claude Code SDK capabilities (context clearing, prompt injection)
+
+#### **Workflow B: Existing Project Migration**
+
+**Overview**: User-driven workflow with minimal detection, maximum reuse of new project patterns, and safe integration.
+
+## **STEP 1: Safety Check & Entry Point Routing**
+
+**Purpose**: Preserve existing work and route to appropriate sub-workflow based on user entry point
+
+**Registry Configuration**: `workflows.existing_project.step.1`
+
+**Task Sequence**:
+
+**Task 1 - Safety Check:**
+- Check `.taskmaster/` folder existence to avoid overwriting existing data
+- **Registry Syntax**: `safety_check: action: check_exists, path: ".taskmaster/", behavior: preserve_if_exists`
+
+**Task 2 - Existing Task Query:**
+- Query existing tasks if task-master already initialized
+- **Registry Syntax**: `task-master: action: query_tasks, filter: incomplete`
+
+**Task 3 - Entry Point Routing:**
+- Route to appropriate sub-workflow based on user's stated entry point
+- No automation - user-directed workflow selection via README.md instructions
+
+## **STEP 2: PRD Resolution (Conditional)**
+
+**Purpose**: Ensure project has validated PRD for task-master operations
+
+**Sub-workflows based on user entry point:**
+
+**Sub-workflow A: PRD Exists**
+- Validate/refine existing PRD with minimal user interaction
+- Reuse new project Step 2 validation patterns
+
+**Sub-workflow B: Specs in CLAUDE.md**
+- Claude extracts and formalizes specs using natural language processing
+- No special tooling required - leverage Claude's built-in capabilities
+- **Registry Syntax**: Reuse new project Step 2 PRD refinement workflow
+
+**Sub-workflow C: No PRD**
+- Branch to new project Step 2 (complete PRD creation workflow)
+
+## **STEP 3: Task-master Alignment & Capability Deployment**
+
+**Purpose**: Align task-master with project state and deploy required capabilities
+
+**Task Sequence**:
+
+**Task 1 - Task-master Initialization/Refresh:**
+- Initialize task-master if not exists, or refresh with updated PRD
+- **Registry Syntax**: `task-master: action: init` (reuse new project syntax)
+
+**Task 2 - Capability Requirements Generation:**
+- Query incomplete tasks for capability requirements
+- Generate capability mappings for existing/pending work
+
+**Task 3 - Project Registry Setup:**
+- Install project registry if missing, sync with existing agents/MCPs
+- **Registry Syntax**: `project_registry: action: sync` (reuse existing syntax)
+
+**Task 4 - Capability Deployment:**
+- Deploy capabilities for current/next tasks
+- **Registry Syntax**: Reuse new project deployment operations
+
+**Task 5 - Context Clear:**
+- **Registry Syntax**: `claude: action: clear_context`
+
+**Task 6 - User Handoff:**
+- **Registry Syntax**: `claude: action: prompt_and_over_to_user`
+
+**Process**:
+```python
+def existing_project_migration(project_root: Path, entry_point: str) -> MigrationResult:
+    """Execute existing project migration with user-driven workflow selection"""
+    # Step 1: Safety and routing
+    safety_result = execute_safety_checks(project_root)
+    existing_tasks = query_existing_tasks() if safety_result.taskmaster_exists else None
+    
+    # Step 2: PRD resolution based on entry point
+    if entry_point == "with_prd":
+        prd = validate_refine_existing_prd()
+    elif entry_point == "specs_in_claude_md":
+        prd = extract_formalize_specs_from_claude_md()  # Use Claude's natural processing
+    elif entry_point == "no_prd":
+        prd = branch_to_new_project_prd_creation()
+    
+    # Step 3: Task-master alignment and deployment
+    initialize_or_refresh_taskmaster(prd)
+    capability_requirements = generate_capability_requirements(existing_tasks)
+    setup_project_registry_if_missing()
+    deploy_capabilities_for_current_work(capability_requirements)
+    
+    # Final handoff
+    execute_claude_action("clear_context")
+    execute_claude_action("prompt_and_over_to_user")
+    
+    return MigrationResult(
+        existing_project_integrated=True,
+        taskmaster_operational=True,
+        capabilities_deployed=True
+    )
+```
+
+**Completion**: Existing project successfully integrated with task-master and capability system operational
 
 ## **STEP 2: Project Planning & Task Generation Phase**
 

@@ -266,6 +266,11 @@ claude-integration:
   - `init` → initialize task-master with PRD and generate task DAG
   - `get_tasks` → retrieve all tasks (CLI/MCP-to-MCP/direct integration)
   - `update_task` → update task with capability requirements (integration dependent)
+  - `query_tasks` with `filter:` → query existing tasks (e.g., filter: "incomplete")
+
+**Safety Check Operations:**
+- `safety_check:` with `action:`, `path:`, and `behavior:`
+  - `check_exists` → check if path exists, behavior: "preserve_if_exists"
 
 **Bootstrap Workflow:**
 
@@ -353,6 +358,81 @@ claude-integration:
 
 **Completion**: All initialization complete, user has control with task-master and full capability system ready
 
+## Existing Project Workflow (Path B)
+
+**Philosophy**: User-driven workflow selection with minimal detection and maximum reuse of new project patterns.
+
+**Key Assumptions:**
+- Core system already installed (not starting from scratch)
+- User wants migration = user wants to uplift project (dissatisfied with current state)
+
+### **User-Driven Entry Points**
+
+**README.md Use Cases** (documented after Installation section):
+- "Migrate existing project with PRD"
+- "Migrate existing project with task-master already initialized" 
+- "Migrate existing project with specs in CLAUDE.md"
+- "Add capabilities to ongoing task-master project"
+
+**User Interaction**: User follows README instructions and tells Claude which entry point applies to their situation.
+
+### **3-Step Workflow Structure**
+
+**Step 1: Safety Check & Entry Point Routing**
+*Purpose: Preserve existing work and route to appropriate sub-workflow*
+
+- **Task 1 - Safety Check:**
+  - Check `.taskmaster/` folder existence to avoid overwriting
+  - **Registry Syntax**: `safety_check: action: check_exists, path: ".taskmaster/", behavior: preserve_if_exists`
+
+- **Task 2 - Existing Task Query:**
+  - Query existing tasks if task-master already initialized
+  - **Registry Syntax**: `task-master: action: query_tasks, filter: incomplete`
+
+- **Task 3 - Entry Point Routing:**
+  - Route to appropriate sub-workflow based on user's stated entry point
+  - No automation - user-directed workflow selection
+
+**Step 2: PRD Resolution (Conditional)**
+*Purpose: Ensure project has validated PRD for task-master initialization*
+
+**Sub-workflow A: PRD Exists**
+- Validate/refine existing PRD with user (minimal changes)
+
+**Sub-workflow B: Specs in CLAUDE.md** 
+- Claude extracts and formalizes specs using natural language processing (no special tooling)
+- **Registry Syntax**: Reuse new project Step 2 PRD refinement workflow
+
+**Sub-workflow C: No PRD**
+- Branch to new project Step 2 (PRD creation workflow)
+
+**Step 3: Task-master Alignment & Capability Deployment**
+*Purpose: Align task-master with project state and deploy required capabilities*
+
+- **Task 1 - Task-master Initialization/Refresh:**
+  - Initialize task-master (if not exists) or refresh with updated PRD
+  - **Registry Syntax**: `task-master: action: init` (reuse new project syntax)
+
+- **Task 2 - Capability Requirements Generation:**
+  - Query incomplete tasks for capability requirements
+  - Generate capability mappings for existing/pending work
+
+- **Task 3 - Project Registry Setup:**
+  - Install project registry if missing + sync with existing agents/MCPs
+  - **Registry Syntax**: `project_registry: action: sync` (reuse existing syntax)
+
+- **Task 4 - Capability Deployment:**
+  - Deploy capabilities for current/next tasks
+  - **Registry Syntax**: Reuse new project deployment syntax
+
+- **Task 5 - Context Clear:**
+  - **Registry Syntax**: `claude: action: clear_context`
+
+- **Task 6 - User Handoff:**
+  - **Registry Syntax**: `claude: action: prompt_and_over_to_user`
+
+**Completion**: Existing project successfully integrated with task-master and capability system operational
+
 # User Experience
 
 - **New Project Bootstrap Flow**:
@@ -376,6 +456,25 @@ claude-integration:
      - Task 1 execution preparation
      - Final context clear and user handoff
   6. **Completion**: User has full operational system with task-master and dynamic capability management
+
+- **Existing Project Migration Flow**:
+  1. User follows README.md use case instructions and declares migration intent with specific entry point
+  2. System prompt triggers claude-capabilities MCP with `existing_project` indicator
+  3. **Step 1 - Safety Check & Entry Point Routing**: Preserve existing work and route appropriately:
+     - Check .taskmaster/ existence to avoid overwriting
+     - Query existing tasks if task-master initialized
+     - Route to sub-workflow based on user entry point
+  4. **Step 2 - PRD Resolution** (conditional based on entry point):
+     - **Sub-workflow A**: Validate/refine existing PRD
+     - **Sub-workflow B**: Extract and formalize specs from CLAUDE.md using Claude's natural processing
+     - **Sub-workflow C**: Branch to new project PRD creation if no PRD exists
+  5. **Step 3 - Task-master Alignment & Capability Deployment**: 
+     - Initialize/refresh task-master with validated PRD
+     - Generate capability requirements for incomplete tasks
+     - Set up project registry and sync with existing setup
+     - Deploy capabilities for current work
+     - Context clear and user handoff
+  6. **Completion**: Existing project integrated with task-master and capability system operational
 
 - **Context Management**:
   - Claude Code and development subagents fetch **summaries first** from Qdrant.
