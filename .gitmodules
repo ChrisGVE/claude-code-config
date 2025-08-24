@@ -6,13 +6,13 @@
 	url = https://github.com/VoltAgent/awesome-claude-code-subagents.git
 [submodule "mcp/ingest-web-mcp"]
 	path = mcp/ingest-web-mcp
-	url = https://github.com/ChrisGVE/claude-code-ingest-web.git
+	url = git@github.com:ChrisGVE/claude-code-ingest-web.git
 [submodule "mcp/claude-capability-manager"]
 	path = mcp/claude-capability-manager
-	url = https://github.com/ChrisGVE/claude-code-capabilities.git
+	url = git@github.com:ChrisGVE/claude-code-capabilities.git
 [submodule "mcp/claude-debugger"]
 	path = mcp/claude-debugger
-	url = https://github.com/ChrisGVE/claude-code-qa-engine.git
+	url = git@github.com:ChrisGVE/claude-code-qa-engine.git
 [submodule "mcp/localdata-mcp"]
 	path = mcp/localdata-mcp
 	url = git@github.com:ChrisGVE/localdata-mcp.git
