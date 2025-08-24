@@ -186,21 +186,25 @@ workflows:
       task: 2
         name: "CLAUDE.md Backup"
         file:
+          action: "move_within_project"
           source: "CLAUDE.md"
           target: "CLAUDE.md.backup"
-          condition: "if_exists"
+          if_exists: yes
       task: 3
         name: "Folder and File Creation" 
         directory: ".claude/agents/"
         directory: ".claude/hooks/"
         directory: ".claude/commands/"
         file:
+          action: "copy_into_project"
           source: "templates/registry.template.yaml"
           target: ".claude/registry.yaml"
         file:
+          action: "copy_into_project"
           source: "templates/task-master.config.json"
           target: ".claude/task-master.config.json"
         file:
+          action: "copy_into_project"
           source: "prompts/CLAUDE.md.step2"
           target: "CLAUDE.md"
       task: 4
@@ -225,8 +229,12 @@ claude-integration:
 **Operation Types:**
 
 **File Operations:**
-- `file:` with `source:` (relative to global registry) and `target:` (relative to project root)
-- Optional `condition:` for conditional operations
+- `file:` with `action:`, `source:`, and `target:`
+- **Actions:**
+  - `copy_into_project`: Copy global file into project (source relative to global registry)
+  - `copy_within_project`: Copy file within project  
+  - `move_within_project`: Move/rename within project (used for backup)
+- Optional `if_exists: yes/no` (unconditional if not specified)
 
 **Directory Operations:**
 - `directory:` (folder relative to project root, uses `mkdir -p` for nested creation)

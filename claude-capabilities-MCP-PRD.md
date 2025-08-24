@@ -73,13 +73,13 @@ def detect_initialization_mode(project_root: Path) -> InitMode:
 **Task 2 - CLAUDE.md Backup:**
 - Check existence of CLAUDE.md
 - If exists: backup as CLAUDE.md.backup (preserve user's existing configuration)
-- **Registry Syntax**: `file: source: "CLAUDE.md", target: "CLAUDE.md.backup", condition: "if_exists"`
+- **Registry Syntax**: `file: action: "move_within_project", source: "CLAUDE.md", target: "CLAUDE.md.backup", if_exists: yes`
 
 **Task 3 - Folder and File Creation:**
 - Create required folder structure: `.claude/agents/`, `.claude/hooks/`, `.claude/commands/`
 - Create files: registry template, task-master standard configuration
-- Copy special Step 2 system prompt into CLAUDE.md (prepare for next step)
-- **Registry Syntax**: `directory:` and `file:` operations with template sources
+- Copy specialized Step 2 system prompt into CLAUDE.md (prepare for next step)
+- **Registry Syntax**: `directory:` and `file: action: "copy_into_project"` operations with global template sources
 
 **Task 4 - Project Registry Population:**
 - Populate project registry with agents already installed in `.claude/agents/`
