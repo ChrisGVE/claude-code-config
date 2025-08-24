@@ -49,3 +49,6 @@
 [submodule "resources/decider-hooks"]
 	path = resources/decider-hooks
 	url = https://github.com/decider/claude-hooks.git
+[submodule "resources/claude-code-hooks-multi-agent-observability"]
+	path = resources/claude-code-hooks-multi-agent-observability
+	url = https://github.com/disler/claude-code-hooks-multi-agent-observability.git
