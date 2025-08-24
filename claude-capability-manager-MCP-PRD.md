@@ -1,8 +1,8 @@
-# claude-capabilities MCP - Product Requirements Document
+# claude-capability-manager MCP - Product Requirements Document
 
 ## Overview
 
-The claude-capabilities MCP is a specialized MCP server that handles dynamic capability management for Claude Code projects. It detects project capabilities from PRDs, installs required MCPs and subagents, and manages the project initialization lifecycle.
+The claude-capability-manager MCP is a specialized MCP server that handles dynamic capability management for Claude Code projects. It detects project capabilities from PRDs, installs required MCPs and subagents, and manages the project initialization lifecycle.
 
 ## Core Functionality
 
@@ -25,14 +25,14 @@ The claude-capabilities MCP is a specialized MCP server that handles dynamic cap
   - `CLAUDE.md.bootstrap` - Initial project setup
   - `CLAUDE.md.step2` - PRD refinement with agent integration
   - `CLAUDE.md.production` - Main execution environment
-  - Templates tightly integrated with claude-capabilities MCP implementation
+  - Templates tightly integrated with claude-capability-manager MCP implementation
 
 ## Technical Specifications
 
 ### Project Initialization Flow
 
 **Dual-Mode Operation**:
-The claude-capabilities MCP handles two distinct initialization scenarios through a single MCP API entry point.
+The claude-capability-manager MCP handles two distinct initialization scenarios through a single MCP API entry point.
 
 **Input**: PRD content + project root path + initialization context
 **Output**: Fully configured Claude Code project + status report
@@ -51,7 +51,7 @@ def detect_initialization_mode(project_root: Path) -> InitMode:
 **Scenario**: Single PRD file (template/draft), potentially some pre-installed agents/MCPs
 **Key Principle**: Registry-driven workflow with complete scaffolding setup
 
-**Trigger**: System prompt triggers claude-capabilities MCP with:
+**Trigger**: System prompt triggers claude-capability-manager MCP with:
 - PRD file location 
 - Project type indicator: `new_project`
 
@@ -61,7 +61,7 @@ def detect_initialization_mode(project_root: Path) -> InitMode:
 **Scenario**: Existing project with codebase, potentially existing .taskmaster/, PRD, or specs in CLAUDE.md
 **Key Principle**: User-driven workflow selection with minimal detection and maximum workflow reuse
 
-**Trigger**: System prompt triggers claude-capabilities MCP with:
+**Trigger**: System prompt triggers claude-capability-manager MCP with:
 - Project root location
 - Project type indicator: `existing_project`
 - User-specified entry point from README.md use cases
@@ -624,7 +624,7 @@ claude mcp add {mcp_name} -- {integration_command}
 ### Registry Management
 
 **Registry Location**: `/Users/chris/dev/ai/claude-code-cfg/resources/registry.yaml`  
-**Global Registry Parameter**: Defined globally when starting the claude-capabilities MCP server
+**Global Registry Parameter**: Defined globally when starting the claude-capability-manager MCP server
 
 **Registry Schema** (extensible YAML structure):
 - **MCPs**: capability mapping, integration commands, replacement patterns
@@ -640,7 +640,7 @@ claude mcp add {mcp_name} -- {integration_command}
   - Task-master docs: https://docs.task-master.dev/introduction
   - Claude Code SDK: https://docs.anthropic.com/en/docs/claude-code/sdk  
   - Claude API: https://docs.anthropic.com/en/api/overview
-- **Memory Storage**: All research findings stored in Qdrant for claude-capabilities MCP design
+- **Memory Storage**: All research findings stored in Qdrant for claude-capability-manager MCP design
 
 ### Error Recovery Strategy
 
@@ -658,7 +658,7 @@ claude mcp add {mcp_name} -- {integration_command}
 
 **New Project**:
 1. User creates project directory and adds PRD.txt
-2. User invokes claude-capabilities MCP (via Claude Code system prompt)
+2. User invokes claude-capability-manager MCP (via Claude Code system prompt)
 3. MCP analyzes PRD, creates project structure, installs capabilities
 4. User receives summary of installed components and any failures
 5. Project ready for Claude Code development workflow
@@ -677,9 +677,9 @@ claude mcp add {mcp_name} -- {integration_command}
 - Provides structured responses for Claude Code consumption
 
 **CLI Mode** (debugging/standalone):
-- `claude-capabilities init <project_path>` - Initialize new project
-- `claude-capabilities uplift <project_path>` - Add new capabilities
-- `claude-capabilities validate <project_path>` - Check project status
+- `claude-capability-manager init <project_path>` - Initialize new project
+- `claude-capability-manager uplift <project_path>` - Add new capabilities
+- `claude-capability-manager validate <project_path>` - Check project status
 
 ## Development Requirements
 

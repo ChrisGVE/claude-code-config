@@ -18,14 +18,14 @@ The project is defined in three parts:
 
 **Task Creation Authority (Hierarchical)**:
 - **Sequential-Thinking**: Creates initial task DAGs from PRDs (bootstrap only)
-- **QA Engine MCP**: Creates bug fix tasks and subtasks when tests fail (QA workflow only)
+- **Claude Debugger MCP**: Creates bug fix tasks and subtasks when tests fail (QA workflow only)
 - **Planner Subagent**: Updates task structure during PRD revisions (planning phases only)
 
 **Task Execution Architecture**:
 - **Claude Code** acts as **supervisor**, orchestrating subagents for all development work
 - **Development Subagents** handle specific tasks (build, fix, refactor, test) under Claude Code supervision
-- **Claude Code** updates task statuses in Task-master and coordinates with QA Engine MCP
-- **QA Engine MCP** handles all testing workflows via self-contained orchestration
+- **Claude Code** updates task statuses in Task-master and coordinates with Claude Debugger MCP
+- **Claude Debugger MCP** handles all testing workflows via self-contained orchestration
 - **GitHub MCP** is used only for repo management (creation, linking to project, and optional issue mirroring)
 
 ## Codebase Context
@@ -54,7 +54,7 @@ The project is defined in three parts:
 - **Specialized Subagents**: Project-specific agents deployed based on capabilities (e.g., Rust expert, React specialist)
 
 **Specialized MCPs**:
-- **QA Engine MCP**: Detailed specifications in [`qa-engine-MCP-PRD.md`](./qa-engine-MCP-PRD.md)
+- **Claude Debugger MCP**: Detailed specifications in [`claude-debugger-MCP-PRD.md`](./claude-debugger-MCP-PRD.md)
 - **Ingest-web MCP Modifications**: Detailed specifications in [`ingest-web-modifications-PRD.md`](./ingest-web-modifications-PRD.md)
 
 **Registry-Based Deployment**:
@@ -71,10 +71,10 @@ The project is defined in three parts:
   - `mermaid` (diagrams/doc-heavy projects)
   - `magic-ui-design` (UI/UX focused projects)
   - `container-use` (devops/testing needs)
-  - `qa-mcp` (custom QA orchestration)
+  - `debugger-mcp` (custom QA orchestration)
 
 - **Registry-driven deployment**: MCP and subagent selection based on project capabilities with GitHub Actions compatibility.
-- **Claude Code Orchestration**: Supervises all development subagents via parallel execution, coordinates task execution, manages handoffs to QA Engine MCP.
+- **Claude Code Orchestration**: Supervises all development subagents via parallel execution, coordinates task execution, manages handoffs to Claude Debugger MCP.
 - **Lifecycle Management**: All subagents deployed on-demand, no permanent agents, Claude manages parallel execution naturally.
 
 ## MCP & Subagent Registry
@@ -111,10 +111,10 @@ The project is defined in three parts:
 **Registry Structure (`resources/registry.yaml`):**
 ```yaml
 mcps:
-  qa-mcp:
-    name: "qa-mcp"
+  debugger-mcp:
+    name: "debugger-mcp"
     capabilities: ["testing", "qa", "e2e"]
-    integration: "qa-mcp --port 8082"
+    integration: "debugger-mcp --port 8082"
   corrode:
     name: "corrode"
     capabilities: ["rust", "cargo.toml"]
@@ -278,7 +278,7 @@ claude-integration:
 
 **Workflow Trigger:**
 - User declares new project with PRD location (draft or template)
-- System prompt triggers claude-capabilities MCP with:
+- System prompt triggers claude-capability-manager MCP with:
   - PRD file location
   - Project type indicator: `new_project`
 
@@ -323,7 +323,7 @@ claude-integration:
   - Available agents: research agents, prompt specialist, architect, etc.
   - Continue until PRD complete and user confirms readiness
 
-**Completion**: System prompt triggers claude-capabilities MCP for Step 3
+**Completion**: System prompt triggers claude-capability-manager MCP for Step 3
 
 **Step 3: Task-master Initialization and Execution Setup**
 *Purpose: Initialize task-master, generate capability requirements, deploy for execution*
@@ -437,7 +437,7 @@ claude-integration:
 
 - **New Project Bootstrap Flow**:
   1. User declares new project with PRD location (draft or template)
-  2. System prompt triggers claude-capabilities MCP with PRD location + `new_project` indicator
+  2. System prompt triggers claude-capability-manager MCP with PRD location + `new_project` indicator
   3. **Step 1 - Project Scaffolding Setup**: Registry-defined workflow execution:
      - Git repository check and cleanup
      - CLAUDE.md backup (preserve existing user configuration)
@@ -459,7 +459,7 @@ claude-integration:
 
 - **Existing Project Migration Flow**:
   1. User follows README.md use case instructions and declares migration intent with specific entry point
-  2. System prompt triggers claude-capabilities MCP with `existing_project` indicator
+  2. System prompt triggers claude-capability-manager MCP with `existing_project` indicator
   3. **Step 1 - Safety Check & Entry Point Routing**: Preserve existing work and route appropriately:
      - Check .taskmaster/ existence to avoid overwriting
      - Query existing tasks if task-master initialized
@@ -589,12 +589,12 @@ The Qdrant MCP requires you to define the payload used by `qdrant-store`/`qdrant
 
 ### QA Architecture
 
-**QA Engine MCP**: Complete architecture and workflow specifications in [`qa-engine-MCP-PRD.md`](./qa-engine-MCP-PRD.md)
+**Claude Debugger MCP**: Complete architecture and workflow specifications in [`claude-debugger-MCP-PRD.md`](./claude-debugger-MCP-PRD.md)
 
 ## System Components
 
 - **Claude Code**: Primary supervisor and orchestrator of all development work via parallel subagent execution.
-- **MCP Servers**: Task-master, Claude-Context, Qdrant, GitHub, Time, Sequential-Thinking, **QA Engine MCP**, and optional project‑specific servers.
+- **MCP Servers**: Task-master, Claude-Context, Qdrant, GitHub, Time, Sequential-Thinking, **Claude Debugger MCP**, and optional project‑specific servers.
 - **On-Demand Subagents**: All subagents (Planner, Architect, Development specialists) deployed based on project phase and capability needs.
 - **Registry-Based Deployment**: Subagents selected and deployed dynamically from registry based on project capabilities.
 
@@ -688,8 +688,8 @@ Registry-driven `.claude/project.json` generation:
     "claude-context": { "command": "claude-context-mcp" },
     "github": { "command": "github-mcp" },
     "time": { "command": "time-mcp" },
-    "qa-mcp": {
-      "command": "qa-mcp",
+    "debugger-mcp": {
+      "command": "debugger-mcp",
       "env": {
         "GITEA_URL": "http://localhost:3000",
         "KIWI_TCMS_URL": "http://localhost:8082",
@@ -719,12 +719,12 @@ Registry-driven `.claude/project.json` generation:
 
 - Task-master as task authority with simplified QA task hierarchy.
 - Sequential-Thinking → Task-master integration.
-- Claude Code orchestrates development subagents, delegates QA to QA Engine MCP.
-- QA Engine MCP with Temporal workflows and specialized tool stack.
+- Claude Code orchestrates development subagents, delegates QA to Claude Debugger MCP.
+- Claude Debugger MCP with Temporal workflows and specialized tool stack.
 - Qdrant integration for project memory, per-project collections.
 - Ingest-web modified to push into Qdrant via SearxNG.
 - Registry-driven `.claude/project.json` bootstrap script.
-- QA MCP as thin layer over Gitea + Kiwi TCMS + ReportPortal + Temporal.
+- Debugger MCP as thin layer over Gitea + Kiwi TCMS + ReportPortal + Temporal.
 - Update automation via manual execution with registry-driven commands.
 
 ## Future Enhancements
@@ -751,12 +751,12 @@ Registry-driven `.claude/project.json` generation:
 
 **Phase 3:**
 - `research-analyst` (reuse) - task-master codebase analysis
-- `mcp-developer` (reuse) - claude-capabilities MCP development
+- `mcp-developer` (reuse) - claude-capability-manager MCP development
 - `python-pro` (02-language-specialists) - Python automation, SDK integration
 
 **Phase 4:**
 - `qa-expert` (04-quality-security) - Test strategy, campaign design
-- `mcp-developer` (reuse) - QA Engine MCP development
+- `mcp-developer` (reuse) - Claude Debugger MCP development
 - `devops-engineer` (03-infrastructure) - QA infrastructure deployment
 
 **Phase 5:**
@@ -797,7 +797,7 @@ Registry-driven `.claude/project.json` generation:
    **3.2 MCP Standard Inter-Server Communication Research** (`research-analyst`):
    - Investigate if MCP standard allows direct server-to-server communication
    - Research MCP protocol for server discovery and communication patterns
-   - Evaluate feasibility of claude-capabilities MCP talking directly to task-master MCP
+   - Evaluate feasibility of claude-capability-manager MCP talking directly to task-master MCP
    - **Goal**: Determine if MCP-to-MCP communication is possible/standardized
    
    **3.3 Direct Integration with Task-master Investigation** (`mcp-developer`):
@@ -808,7 +808,7 @@ Registry-driven `.claude/project.json` generation:
    - **Goal**: Direct integration approach evaluation and monitoring strategy
    
    **3.4 Python-JavaScript Integration via Shims** (`mcp-developer`):
-   - Explore shim layer between Python (claude-capabilities) and JavaScript (task-master)
+   - Explore shim layer between Python (claude-capability-manager) and JavaScript (task-master)
    - Investigate interop patterns and best practices
    - Evaluate performance and maintenance implications of bridge solutions
    - Research Node.js/Python bridge solutions and tooling
@@ -832,7 +832,7 @@ Registry-driven `.claude/project.json` generation:
    - Ingest and memorize Task-master CLI commands and integration patterns (`research-analyst`)
    - **Source**: https://docs.task-master.dev/introduction
    - Store CLI command reference, PRD parsing capabilities, and task management APIs in Qdrant
-   - **Goal**: Foundation knowledge for Task-master CLI integration in claude-capabilities MCP
+   - **Goal**: Foundation knowledge for Task-master CLI integration in claude-capability-manager MCP
 
 ## Phase 2: Memory & Research Enhancement
 **Goal**: Add project memory and web research capabilities
@@ -855,10 +855,10 @@ Registry-driven `.claude/project.json` generation:
 
 **Recommended Subagents**:
 - `research-analyst`: task-master codebase analysis, pattern identification
-- `mcp-developer`: claude-capabilities MCP development, protocol implementation
+- `mcp-developer`: claude-capability-manager MCP development, protocol implementation
 - `python-pro`: Python SDK integration, automation scripts
 
-1. **claude-capabilities MCP Development**:
+1. **claude-capability-manager MCP Development**:
    - Apply Task-master codebase analysis learnings from Phase 1 (`research-analyst`)
    - Build capability detection and deployment system (`mcp-developer`)
    - Registry-driven project bootstrap (`python-pro`)
@@ -872,10 +872,10 @@ Registry-driven `.claude/project.json` generation:
 
 **Recommended Subagents**:
 - `qa-expert`: Test strategy design, campaign planning, quality metrics
-- `mcp-developer`: QA Engine MCP development, Temporal integration
+- `mcp-developer`: Claude Debugger MCP development, Temporal integration
 - `devops-engineer`: QA infrastructure setup, service orchestration
 
-1. **QA Engine MCP**:
+1. **Claude Debugger MCP**:
    - Temporal workflow orchestration (`mcp-developer`)
    - Campaign-based testing system (`qa-expert`)
 
@@ -902,7 +902,7 @@ Registry-driven `.claude/project.json` generation:
 - **Context bloat** → mitigated by summary-first retrieval in Qdrant.
 - **Embedding quality tradeoffs** → standardized on Ollama nomic-embed-text (768-d) across all components.
 - **Complexity in per-project configs** → mitigated with bootstrap script and registry-driven rules.
-- **QA pipeline failures** → mitigated by QA Engine MCP with progressive testing, smart circuit breaking, container isolation, and operational safeguards.
+- **QA pipeline failures** → mitigated by Claude Debugger MCP with progressive testing, smart circuit breaking, container isolation, and operational safeguards.
 - **QA tooling complexity** → accepted tradeoff for preventing Task-master context drift and ensuring campaign completion (validated by experimentation).
 
 # Permanent Subagents Definitions
@@ -945,7 +945,7 @@ Owns system and code architecture decisions (boundaries, components, data contra
 - Favor ADRs (short, versioned). Don't push long blobs into context; store then summarize.
 ```
 
-**Note**: QA Engine MCP is a self-contained MCP server (like task-master) and does not require a separate global subagent definition. It may use internal subagents for workflow orchestration, but these are managed within the MCP itself.
+**Note**: Claude Debugger MCP is a self-contained MCP server (like task-master) and does not require a separate global subagent definition. It may use internal subagents for workflow orchestration, but these are managed within the MCP itself.
 
 # Example Code Snippets
 
@@ -1084,7 +1084,7 @@ for h in hits:
 3. Create task plan in task-master
 4. Final task: "Plan testing campaign, confirm with user, update task-master"
 
-**claude-capabilities MCP**: Detailed specifications in [`claude-capabilities-MCP-PRD.md`](./claude-capabilities-MCP-PRD.md)
+**claude-capability-manager MCP**: Detailed specifications in [`claude-capability-manager-MCP-PRD.md`](./claude-capability-manager-MCP-PRD.md)
 
 ## Task-Capability Binding Architecture
 
@@ -1100,7 +1100,7 @@ for h in hits:
 # System Prompt Suggestions
 
 - **Task separation**
-  "Task creation follows strict hierarchy: Sequential-Thinking (bootstrap), QA Engine MCP (test failures), Planner Subagent (PRD revisions). Claude Code supervises development subagents but never creates tasks - coordinates execution only and reports status back to Task-master."
+  "Task creation follows strict hierarchy: Sequential-Thinking (bootstrap), Claude Debugger MCP (test failures), Planner Subagent (PRD revisions). Claude Code supervises development subagents but never creates tasks - coordinates execution only and reports status back to Task-master."
 
 - **Statuses & dependencies**
   “Use only the canonical statuses: `pending`, `done`, `deferred`. Model blocking exclusively via `dependencies`. Treat work‑in‑progress as `pending` and log progress in `details` with time‑stamped notes.”
@@ -1115,7 +1115,7 @@ for h in hits:
   “Reference Task IDs (e.g., `8`, `8.1`) in commits, PR titles, Qdrant `related_task_ids`, and ADRs.”
 
 - **Role boundaries**  
-  "Claude Code: supervisor and orchestrator. Development Subagents: build, fix, refactor under supervision. QA Engine MCP: testing workflows via Temporal. Clear handoff at QA task delegation."
+  "Claude Code: supervisor and orchestrator. Development Subagents: build, fix, refactor under supervision. Claude Debugger MCP: testing workflows via Temporal. Clear handoff at QA task delegation."
 
 - **QA workflow hierarchy**
   "Use simplified task structure: campaign → fix task → bug subtasks. Bugs tracked in Gitea Issues with detailed lifecycle, subtasks for work items."
