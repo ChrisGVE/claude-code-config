@@ -28,3 +28,6 @@
 [submodule "resources/zhsama-claude-workflow"]
 	path = resources/zhsama-claude-workflow
 	url = https://github.com/zhsama/claude-sub-agent.git
+[submodule "resources/0xfurai-agents"]
+	path = resources/0xfurai-agents
+	url = https://github.com/0xfurai/claude-code-subagents.git
