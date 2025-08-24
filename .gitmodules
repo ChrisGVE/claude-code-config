@@ -43,3 +43,6 @@
 [submodule "resources/claude-code-hooks-mastery"]
 	path = resources/claude-code-hooks-mastery
 	url = https://github.com/disler/claude-code-hooks-mastery.git
+[submodule "resources/webdevtodayjason-hooks"]
+	path = resources/webdevtodayjason-hooks
+	url = https://github.com/webdevtodayjason/claude-hooks.git
