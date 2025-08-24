@@ -40,3 +40,6 @@
 [submodule "resources/wshobson-commands"]
 	path = resources/wshobson-commands
 	url = https://github.com/wshobson/commands.git
+[submodule "resources/claude-code-hooks-mastery"]
+	path = resources/claude-code-hooks-mastery
+	url = https://github.com/disler/claude-code-hooks-mastery.git
