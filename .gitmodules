@@ -1,9 +1,3 @@
-[submodule "resources/subagent-example-script"]
-	path = resources/subagent-example-script
-	url = https://github.com/derek-opdee/subagent-example-script.git
-[submodule "resources/awesome-claude-code-subagents"]
-	path = resources/awesome-claude-code-subagents
-	url = https://github.com/VoltAgent/awesome-claude-code-subagents.git
 [submodule "mcp/ingest-web-mcp"]
 	path = mcp/ingest-web-mcp
 	url = git@github.com:ChrisGVE/claude-code-ingest-web.git
@@ -19,3 +13,6 @@
 [submodule "mcp/serena"]
 	path = mcp/serena
 	url = https://github.com/oraios/serena.git
+[submodule "resources/awesome-claude-code-subagents"]
+	path = resources/awesome-claude-code-subagents
+	url = https://github.com/VoltAgent/awesome-claude-code-subagents.git
