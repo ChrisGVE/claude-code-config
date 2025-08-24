@@ -163,6 +163,82 @@ def step2_prd_refinement(project_root: Path) -> PRDRefinementResult:
 - Prompt injection and control handoff capability
 - Message sending capability for user communication
 
+## **STEP 3: Task-master Initialization and Execution Setup**
+
+**Purpose**: Initialize task-master, generate capability requirements, deploy for execution
+
+**Registry Configuration**: `workflows.new_project.step.3`
+
+**Task Sequence**:
+
+**Task 1 - Task-master Initialization:**
+- Initialize task-master with refined PRD (variable filename received from Claude)
+- Task-master generates complete task DAG according to PRD specifications
+- **Registry Syntax**: `task-master: action: init, prd_file: [dynamic]` (syntax TBD based on integration approach)
+
+**Task 2 - Capability Requirements Generation:**
+- Retrieve each task from task-master (CLI/MCP-to-MCP/direct integration)
+- Deploy capability analysis subagent to generate required capabilities per task
+- Update tasks with capability requirements for dynamic deployment
+- **Integration Dependencies**: TBD based on task-master integration research and capability storage solution
+
+**Task 3 - System Prompt Replacement and Agent Cleanup:**
+- Replace CLAUDE.md with main production system prompt
+- Undeploy initialization-specific subagents (planner, architect, etc.)
+- **Registry Syntax**: `project_registry: action: undeploy_agent, name: ["planner", "architect", "prompt-specialist"]`
+
+**Task 4 - Task 1 Execution Preparation:**
+- Deploy agents/MCPs needed for task-master's first task execution
+- **Implementation**: TBD based on chosen task-master integration approach
+- **Registry Syntax**: `project_registry: action: deploy_agent, name: [task1_required_agents]`
+
+**Task 5 - Context Clear:**
+- Clear context for production execution phase
+- **Registry Syntax**: `claude: action: clear_context`
+
+**Task 6 - Final User Handoff:**
+- Hand complete control back to user with full system operational
+- **Registry Syntax**: `claude: action: prompt_and_over_to_user, prompt: "Project initialization complete..."`
+
+**Process**:
+```python
+def step3_taskmaster_initialization(project_root: Path, prd_file: str) -> InitializationResult:
+    """Execute complete task-master setup and capability deployment"""
+    # Load Step 3 workflow from registry
+    workflow = load_registry_workflow("new_project", step=3)
+    
+    # Initialize task-master with refined PRD
+    taskmaster_result = execute_taskmaster_action("init", prd_file=prd_file)
+    
+    # Generate capability requirements for each task
+    tasks = get_all_tasks_from_taskmaster()
+    for task in tasks:
+        capabilities = generate_task_capabilities(task)
+        update_task_capabilities(task.id, capabilities)
+    
+    # System cleanup and deployment
+    cleanup_initialization_agents()
+    deploy_task1_capabilities(tasks[0])
+    
+    # Final handoff
+    execute_claude_action("clear_context")
+    execute_claude_action("prompt_and_over_to_user", 
+                         prompt="Project initialization complete. All systems ready.")
+    
+    return InitializationResult(
+        taskmaster_initialized=True,
+        capabilities_mapped=True,
+        user_ready=True
+    )
+```
+
+**Completion**: All initialization complete, user has control with task-master and full capability system operational
+
+**Research Dependencies**:
+- Task-master integration approach (CLI/MCP-to-MCP/direct)
+- Capability storage and retrieval mechanism  
+- Dynamic capability deployment on task transitions
+
 ## **STEP 2: Project Planning & Task Generation Phase**
 
 **Dynamic Reconfiguration**:

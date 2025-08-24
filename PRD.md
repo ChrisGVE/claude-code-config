@@ -248,16 +248,24 @@ claude-integration:
 - `message:` (optional, automatically appended in quotes)
 
 **Project Registry Operations:**
-- `project_registry:` with `action:`
+- `project_registry:` with `action:` and `name:` (single string or list)
   - `sync` → synchronize project registry with installed agents/MCPs
-  - `deploy_agent` with `agent_name:`
-  - Future: `deploy_mcp`, `undeploy_agent`, `undeploy_mcp`
+  - `deploy_agent` → deploy agent(s)  
+  - `deploy_mcp` → deploy MCP(s)
+  - `undeploy_agent` → undeploy agent(s)
+  - `undeploy_mcp` → undeploy MCP(s)
 
 **Claude Operations:**
 - `claude:` with `action:` (pending Claude Code SDK capability research):
   - `clear_context` → equivalent of `/clear` command to reset context
   - `prompt_and_over_to_user` with `prompt:` → inject prompt and hand control to user
   - `message` with `message:` → send message to user from within MCP
+
+**Task-master Operations:**
+- `task-master:` with `action:` (syntax TBD based on chosen integration approach):
+  - `init` → initialize task-master with PRD and generate task DAG
+  - `get_tasks` → retrieve all tasks (CLI/MCP-to-MCP/direct integration)
+  - `update_task` → update task with capability requirements (integration dependent)
 
 **Bootstrap Workflow:**
 
@@ -312,21 +320,62 @@ claude-integration:
 
 **Completion**: System prompt triggers claude-capabilities MCP for Step 3
 
-**Step 3: [To be defined]**
+**Step 3: Task-master Initialization and Execution Setup**
+*Purpose: Initialize task-master, generate capability requirements, deploy for execution*
+
+- **Task 1 - Task-master Initialization:**
+  - Initialize task-master with refined PRD (variable filename from Claude)
+  - Task-master defines complete task DAG according to PRD
+  - **Registry Syntax**: `task-master: action: init` (syntax TBD based on chosen integration approach)
+
+- **Task 2 - Capability Requirements Generation:**
+  - Get each task from task-master (CLI or MCP-to-MCP communication)
+  - Use subagent to generate required capabilities for each task
+  - Update tasks with capability requirements
+  - **Integration Dependencies**: TBD based on task-master integration research
+
+- **Task 3 - System Prompt Replacement and Agent Cleanup:**
+  - Replace CLAUDE.md with main system prompt
+  - Undeploy initialization subagents
+  - **Registry Syntax**: `project_registry: action: undeploy_agent, name: ["planner", "architect"]`
+
+- **Task 4 - Task 1 Execution Preparation:**
+  - Deploy agents/MCPs needed for task-master's first task
+  - **Implementation**: TBD based on chosen task-master integration approach
+
+- **Task 5 - Context Clear:**
+  - Clear context for execution phase
+  - **Registry Syntax**: `claude: action: clear_context`
+
+- **Task 6 - Final User Handoff:**
+  - Hand complete control back to user with full system ready
+  - **Registry Syntax**: `claude: action: prompt_and_over_to_user, prompt: "[execution ready prompt]"`
+
+**Completion**: All initialization complete, user has control with task-master and full capability system ready
 
 # User Experience
 
 - **New Project Bootstrap Flow**:
   1. User declares new project with PRD location (draft or template)
   2. System prompt triggers claude-capabilities MCP with PRD location + `new_project` indicator
-  3. **Step 1 - Project Scaffolding Setup**: claude-capabilities MCP executes registry-defined workflow:
+  3. **Step 1 - Project Scaffolding Setup**: Registry-defined workflow execution:
      - Git repository check and cleanup
      - CLAUDE.md backup (preserve existing user configuration)
      - Folder structure creation (.claude/agents/, .claude/hooks/, etc.)
      - File creation (registry template, task-master config, Step 2 system prompt)
      - Project registry population and agent installation
-  4. **Step 2**: [To be defined - initial configuration]
-  5. **Step 3**: [To be defined - task planning and execution setup]
+  4. **Step 2 - PRD Iterative Refinement**: Context clear and iterative PRD work:
+     - Context clear to load installed agents
+     - Specialized prompt injection for PRD refinement
+     - Iterative work with research agents, prompt specialists, architects
+     - Continue until PRD complete and user confirms readiness
+  5. **Step 3 - Task-master Initialization and Execution Setup**: Final system preparation:
+     - Task-master initialization with refined PRD
+     - Capability requirements generation for each task
+     - System prompt replacement and initialization agent cleanup
+     - Task 1 execution preparation
+     - Final context clear and user handoff
+  6. **Completion**: User has full operational system with task-master and dynamic capability management
 
 - **Context Management**:
   - Claude Code and development subagents fetch **summaries first** from Qdrant.
