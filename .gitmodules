@@ -37,3 +37,6 @@
 [submodule "resources/qdhenry-commands"]
 	path = resources/qdhenry-commands
 	url = https://github.com/qdhenry/Claude-Command-Suite.git
+[submodule "resources/wshobson-commands"]
+	path = resources/wshobson-commands
+	url = https://github.com/wshobson/commands.git
