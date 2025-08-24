@@ -61,3 +61,6 @@
 [submodule "resources/chongdashu-statusline"]
 	path = resources/chongdashu-statusline
 	url = https://github.com/chongdashu/cc-statusline.git
+[submodule "resources/gabriel-dehan-statusline"]
+	path = resources/gabriel-dehan-statusline
+	url = https://github.com/gabriel-dehan/claude_monitor_statusline.git
