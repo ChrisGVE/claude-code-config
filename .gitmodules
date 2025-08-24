@@ -58,3 +58,6 @@
 [submodule "resources/ersinkoc-statusline"]
 	path = resources/ersinkoc-statusline
 	url = https://github.com/ersinkoc/claude-statusline.git
+[submodule "resources/chongdashu-statusline"]
+	path = resources/chongdashu-statusline
+	url = https://github.com/chongdashu/cc-statusline.git
