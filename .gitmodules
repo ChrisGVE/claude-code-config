@@ -34,3 +34,6 @@
 [submodule "resources/awesome-claude-code"]
 	path = resources/awesome-claude-code
 	url = https://github.com/hesreallyhim/awesome-claude-code.git
+[submodule "resources/qdhenry-commands"]
+	path = resources/qdhenry-commands
+	url = https://github.com/qdhenry/Claude-Command-Suite.git
