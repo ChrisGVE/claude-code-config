@@ -102,22 +102,66 @@ def step1_scaffolding_setup(project_root: Path, prd_location: str) -> Scaffoldin
     for task in workflow.tasks:
         execute_registry_task(task, project_root)
     
-    # Iterative PRD refinement
-    while not prd_ready_for_planning():
-        refined_prd = iterate_prd_refinement(
-            current_prd=get_prd_content(project_root),
-            agents=step1_config.agents,
-            prompts=step1_config.prompts
-        )
-        save_prd_version(refined_prd, project_root)
-    
-    return PRDRefinementResult(
-        final_prd=refined_prd,
-        transition_ready=True
+    return ScaffoldingResult(
+        agents_installed=True,
+        project_structure_created=True,
+        step2_ready=True
     )
 ```
 
-**Transition Condition**: Defined in the prompt - PRD refinement complete signal
+## **STEP 2: PRD Iterative Refinement**
+
+**Purpose**: Work iteratively with user on PRD until complete and confirmed
+
+**Registry Configuration**: `workflows.new_project.step.2`
+
+**Task Sequence**:
+
+**Task 1 - Context Clear:**
+- Clear context to load agents installed in Step 1 (equivalent of `/clear` command)
+- **Registry Syntax**: `claude: action: clear_context` (pending SDK capability research)
+- **Fallback**: Prompt user to quit and relaunch Claude if SDK doesn't support automation
+
+**Task 2 - Prompt Injection and User Handoff:**
+- Inject specialized PRD refinement prompt from `prompts/CLAUDE.md.step2`
+- Hand control to Claude for iterative user interaction
+- **Registry Syntax**: `claude: action: prompt_and_over_to_user, prompt: "[PRD refinement prompt]"`
+
+**Iterative Process**:
+- Available agents: research agents, prompt specialist, architect, etc.
+- Process varies by PRD state:
+  - **Empty template**: Everything must be defined
+  - **Existing draft**: Review, identify gaps, contradictions, challenge design
+- Continue until PRD complete and user confirms readiness
+
+**Process**:
+```python
+def step2_prd_refinement(project_root: Path) -> PRDRefinementResult:
+    """Execute context clear and prompt injection, hand control to Claude"""
+    # Load Step 2 workflow from registry
+    workflow = load_registry_workflow("new_project", step=2)
+    
+    # Execute context clear (if SDK supports)
+    if claude_sdk_supports_context_clear():
+        execute_claude_action("clear_context")
+    else:
+        prompt_user_to_restart_claude()
+    
+    # Inject PRD refinement prompt and hand control to user
+    prd_prompt = load_step2_prompt()
+    execute_claude_action("prompt_and_over_to_user", prompt=prd_prompt)
+    
+    # Control handed to Claude for iterative PRD work with user
+    # Return when system prompt detects PRD completion and user confirmation
+    return PRDRefinementResult(prd_ready_for_step3=True)
+```
+
+**Completion Trigger**: System prompt detects PRD completion and user confirmation, then triggers Step 3
+
+**SDK Research Dependencies**:
+- Context clearing automation capability
+- Prompt injection and control handoff capability
+- Message sending capability for user communication
 
 ## **STEP 2: Project Planning & Task Generation Phase**
 

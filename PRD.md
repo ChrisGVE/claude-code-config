@@ -253,6 +253,12 @@ claude-integration:
   - `deploy_agent` with `agent_name:`
   - Future: `deploy_mcp`, `undeploy_agent`, `undeploy_mcp`
 
+**Claude Operations:**
+- `claude:` with `action:` (pending Claude Code SDK capability research):
+  - `clear_context` → equivalent of `/clear` command to reset context
+  - `prompt_and_over_to_user` with `prompt:` → inject prompt and hand control to user
+  - `message` with `message:` → send message to user from within MCP
+
 **Bootstrap Workflow:**
 
 ## New Project Workflow (Path A)
@@ -289,7 +295,22 @@ claude-integration:
   - Install necessary agents (defined in global registry workflows section)
   - Hook agents up to project registry
 
-**Step 2: [To be defined]**
+**Step 2: PRD Iterative Refinement**
+*Purpose: Work iteratively with user on PRD until complete and confirmed*
+
+- **Task 1 - Context Clear:**
+  - Clear context to load agents installed in Step 1 (equivalent of `/clear` command)
+  - **Registry Syntax**: `claude: action: clear_context` (pending SDK capability research)
+  - Fallback: Prompt user to quit and relaunch Claude
+
+- **Task 2 - Prompt Injection and User Handoff:**
+  - Inject specialized PRD refinement prompt
+  - Hand control to Claude for iterative user interaction
+  - **Registry Syntax**: `claude: action: prompt_and_over_to_user, prompt: "..."`
+  - Available agents: research agents, prompt specialist, architect, etc.
+  - Continue until PRD complete and user confirms readiness
+
+**Completion**: System prompt triggers claude-capabilities MCP for Step 3
 
 **Step 3: [To be defined]**
 
