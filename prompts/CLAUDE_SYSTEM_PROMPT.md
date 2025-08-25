@@ -51,7 +51,7 @@ When uncertain about scope, default to minimal interpretation and confirm.
 When starting a new project:
 
 1. Check for existing PRD.txt
-2. If missing, copy template from `/Users/chris/dev/ai/prompts/PRD.txt`
+2. If missing, copy template from `/Users/chris/dev/ai/claude-code-cfg/prompts/PRD.txt`
 3. Get user confirmation: "Is the PRD complete?"
 4. Use `task-master parse-prd` to generate tasks
 5. Store PRD.txt in project root
@@ -60,9 +60,8 @@ When starting a new project:
 
 If missing from project root, copy these files:
 
-- `/Users/chris/dev/ai/prompts/CLAUDE_SYSTEM.md` → `CLAUDE_SYSTEM.md`
-- `/Users/chris/dev/ai/prompts/CLAUDE.md.template` → `CLAUDE.md` (rename!)
-- `/Users/chris/dev/ai/prompts/ALGO.md` → `ALGO.md`
+- `/Users/chris/dev/ai/claude-code-cfg/CLAUDE.md.template` → `CLAUDE.md` (rename!)
+- `/Users/chris/dev/ai/claude-code-cfg/prompts/ALGO.md` → `ALGO.md`
 
 ## Task Management - CRITICAL
 
@@ -73,7 +72,8 @@ If missing from project root, copy these files:
 - Use `task-master add_task` to add tasks
 - Use `task-master set_task_status` to update
 - Use `task-master research` to conduct research-driven development
-- For EACH task: use `sequential-thinking` to break it down and create subtasks using `task-master expand`
+- For EACH task: create subtasks using `task-master expand`
+- When executing any tasks or subtasks, always use `sequential-thinking` to break it down and execute it step by step
 
 ## Task-Master Migration
 
