@@ -10,9 +10,6 @@
 [submodule "mcp/localdata-mcp"]
 	path = mcp/localdata-mcp
 	url = git@github.com:ChrisGVE/localdata-mcp.git
-[submodule "mcp/serena"]
-	path = mcp/serena
-	url = https://github.com/oraios/serena.git
 [submodule "resources/awesome-claude-code-subagents"]
 	path = resources/awesome-claude-code-subagents
 	url = https://github.com/VoltAgent/awesome-claude-code-subagents.git
@@ -73,3 +70,6 @@
 [submodule "resources/brennercruvinel-plugins"]
 	path = resources/brennercruvinel-plugins
 	url = https://github.com/brennercruvinel/CCPlugins.git
+[submodule "mcp/qdrant"]
+	path = mcp/qdrant
+	url = https://github.com/qdrant/qdrant.git
