@@ -1,0 +1,257 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Establish Core Infrastructure and Vector Stores",
+        "description": "Set up the foundational vector storage infrastructure with Qdrant for project memory and verify Milvus integration for code context via Claude-Context-MCP",
+        "details": "Install and configure Qdrant Docker container with proper port allocation (6333/6334). Verify collection creation with 768-dimensional vectors using nomic-embed-text model. Ensure Milvus is properly integrated with claude-context-mcp for semantic code search. Test end-to-end vector storage and retrieval workflows. Create per-project collection naming strategy (pm_<project-slug>) and validate Qdrant schema with required fields: project, type, tags, stage, summary, content_ref, related_task_ids, created_at, updated_at.",
+        "testStrategy": "Create test collections, verify vector operations, validate schema compliance, test concurrent access patterns, and ensure proper isolation between project collections",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Qdrant Docker container with port configuration",
+            "description": "Install and configure Qdrant Docker container with proper port allocation for both HTTP (6333) and gRPC (6334) interfaces",
+            "dependencies": [],
+            "details": "Create docker-compose.yml configuration for Qdrant service with port mapping 6333:6333 and 6334:6334. Configure persistent volume for data storage. Set appropriate memory and CPU limits. Verify container startup and health checks.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Qdrant collection creation with 768-dimensional vectors",
+            "description": "Create Qdrant collections with proper configuration for 768-dimensional vectors using nomic-embed-text model specifications",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "Configure collection with 768-dimensional vector space, cosine similarity metric, and appropriate indexing parameters. Set up collection creation API calls with proper error handling and validation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Design and validate Qdrant schema with required fields",
+            "description": "Define and implement the complete schema structure with all required fields for project memory management",
+            "dependencies": [
+              "1.2"
+            ],
+            "details": "Create schema with fields: project (string), type (string), tags (array), stage (string), summary (string, ≤200 tokens), content_ref (string), related_task_ids (array), created_at (timestamp), updated_at (timestamp). Validate field types and constraints.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement per-project collection naming strategy",
+            "description": "Create standardized naming convention for project-specific collections using pm_<project-slug> format",
+            "dependencies": [
+              "1.3"
+            ],
+            "details": "Implement collection naming function that converts project names to valid slugs (lowercase, hyphens, alphanumeric). Create collection management utilities for project isolation and namespace handling.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Verify Milvus integration with claude-context-mcp",
+            "description": "Validate existing Milvus integration through claude-context-mcp for semantic code search functionality",
+            "dependencies": [],
+            "details": "Test claude-context-mcp connection to Milvus instance. Verify code indexing capabilities and semantic search functionality. Ensure proper configuration and connectivity between components.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create vector storage and retrieval API interface",
+            "description": "Implement standardized API interface for vector storage and retrieval operations with Qdrant",
+            "dependencies": [
+              "1.4"
+            ],
+            "details": "Build Python API layer with functions for vector upsert, search, delete, and collection management. Include error handling, connection pooling, and retry logic. Support both synchronous and asynchronous operations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Implement end-to-end testing workflows",
+            "description": "Create comprehensive test suite for vector storage and retrieval operations across both Qdrant and Milvus systems",
+            "dependencies": [
+              "1.6",
+              "1.5"
+            ],
+            "details": "Develop test cases for collection creation, vector upsert/search operations, schema validation, project isolation, concurrent access patterns, and error scenarios. Include performance benchmarks and stress tests.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Validate integration between Qdrant and Milvus systems",
+            "description": "Ensure proper coordination and data flow between Qdrant project memory and Milvus code context systems",
+            "dependencies": [
+              "1.7"
+            ],
+            "details": "Test cross-system operations, validate data consistency, verify proper isolation between project memory (Qdrant) and code context (Milvus). Ensure no conflicts in collection naming or data access patterns.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement claude-capability-manager MCP Server",
+        "description": "Develop the core MCP server that handles dynamic capability detection, installation, and project initialization using FastMCP framework",
+        "details": "Build Python-based MCP server using claude-code-sdk and FastMCP framework. Implement dual-mode operation (stdio MCP server and CLI tool). Core functionality includes: capability detection from PRDs, registry-driven MCP/subagent deployment, project scaffolding with .claude folder structure, template management for CLAUDE.md variants (bootstrap, step2, production). Support both new project and existing project workflows. Integrate with registry.yaml for capability mapping to required tools.",
+        "testStrategy": "Unit tests for capability detection logic, integration tests with registry.yaml, end-to-end project initialization testing, CLI mode validation, and error handling for failed tool deployments",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Create Registry System and Project Bootstrap Workflows",
+        "description": "Design and implement the registry.yaml system with workflow definitions for automated project setup and capability deployment",
+        "details": "Create comprehensive registry.yaml with MCP definitions, subagent mappings, and workflow orchestration syntax. Define workflow operations: file operations (copy_into_project, move_within_project), directory creation, git operations, project_registry actions (sync, deploy_agent, deploy_mcp), task-master operations, and safety checks. Implement the 3-step new project workflow: Project Scaffolding Setup, PRD Iterative Refinement, Task-master Initialization and Execution Setup. Build existing project migration workflows with entry point detection.",
+        "testStrategy": "Validate registry.yaml schema, test workflow execution, verify file operations, test git integration, validate project structure creation, and test rollback capabilities",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Develop Task-master Integration Architecture",
+        "description": "Research and implement integration approaches with Task-master MCP server for seamless task management and capability binding",
+        "details": "Conduct comprehensive analysis of Task-master architecture and integration options: MCP-to-MCP communication patterns, CLI interface integration, direct JavaScript codebase integration, Python-JavaScript bridge solutions. Implement chosen integration approach with capability requirements binding. Create monitoring system for task-master repository changes and implement CI setup for breaking change detection. Follow canonical task schema without custom fields, using details/testStrategy for cross-references.",
+        "testStrategy": "Test MCP communication patterns, validate task schema compliance, test capability binding mechanisms, verify repository monitoring, and validate integration stability",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement ingest-web-mcp with SearxNG Integration",
+        "description": "Adapt existing ingest-web-mcp to integrate with SearxNG for web content ingestion and push results into Qdrant instead of Milvus",
+        "details": "Modify ingest-web-mcp pipeline: SearxNG search with JSON format, URL deduplication using tldextract, content fetching with retries via tenacity, parsing using trafilatura with BeautifulSoup fallback, summarization into ≤200 tokens, embedding via Ollama nomic-embed-text (768-d), and upsert to Qdrant with project-specific collections. Implement content filtering for malicious domains and basic validation. Set up SearxNG Docker container on port 8080 with proper configuration.",
+        "testStrategy": "Test SearxNG API integration, validate content parsing pipeline, verify Qdrant upsert operations, test embedding generation, validate content filtering, and test end-to-end web research workflows",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Build Subagent Management and Deployment System",
+        "description": "Create on-demand subagent deployment system with phase-based activation and registry-driven selection from the awesome-claude-code-subagents collection",
+        "details": "Implement subagent lifecycle management: registry-based selection using capabilities matching, phase-based deployment (bootstrap, prd_revision, development, implementation), on-demand activation with no permanent agents. Create subagent definitions for core agents: Planner (PRD to task DAG conversion), Architect (ADR management), Backend/Frontend Engineers, Testing Specialists. Integrate with 100+ community agents from resources/awesome-claude-code-subagents. Implement agent customization pipeline with automated adaptation.",
+        "testStrategy": "Test subagent selection algorithms, validate phase-based deployment, test agent lifecycle management, verify capability matching logic, and validate community agent integration",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Develop Claude Debugger MCP with QA Infrastructure",
+        "description": "Build specialized MCP server for QA orchestration using Temporal workflows with Gitea, Kiwi TCMS, and ReportPortal integration",
+        "details": "Implement Claude Debugger MCP as self-contained server with Temporal workflow orchestration. Set up QA infrastructure stack: Gitea/Forgejo (port 3000) for Git and Issues, Kiwi TCMS (port 8082) for test campaign management, ReportPortal (port 8081) for analytics, Temporal (port 7233) for workflows, Langfuse for agent tracing. Create simplified task hierarchy: campaign → fix task → bug subtasks. Implement progressive testing, smart circuit breaking, and container isolation. Integrate with Task-master for QA task creation and status updates.",
+        "testStrategy": "Test Temporal workflow execution, validate QA infrastructure integration, test bug lifecycle management, verify campaign-based testing, validate Task-master integration, and test error handling workflows",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Create Project Memory and Context Management",
+        "description": "Implement Qdrant-based project memory system with summary-first retrieval and content hydration patterns for efficient context management",
+        "details": "Build project memory management with per-project Qdrant collections using schema: project, type (algorithm|decision|design|note|todo|adr), tags, stage (draft|refined|final), summary (≤200 tokens), content_ref, related_task_ids, timestamps. Implement summary-first retrieval pattern with explicit full content hydration. Create memory storage tools for algorithms, ADRs, decisions, and design documents. Integrate with ingest-web-mcp for external content storage. Implement memory querying with filters and semantic search capabilities.",
+        "testStrategy": "Test memory storage and retrieval, validate schema compliance, test summary-first patterns, verify content hydration, validate semantic search accuracy, and test cross-project isolation",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Implement System Prompt Management and Template System",
+        "description": "Create dynamic system prompt management with specialized templates for different workflow phases and project states",
+        "details": "Develop multi-template system for CLAUDE.md: CLAUDE.md.bootstrap (initial setup), CLAUDE.md.step2 (PRD refinement with agents), CLAUDE.md.production (main execution). Implement template switching during workflow phases via claude-capability-manager MCP. Create system prompt suggestions for task separation, status management, retrieval discipline, code retrieval patterns, traceability, role boundaries, QA workflows, and error handling. Integrate with existing CLAUDE.md.template and global system prompts.",
+        "testStrategy": "Test template switching mechanisms, validate prompt effectiveness, test workflow phase transitions, verify system prompt consistency, and validate user experience across phases",
+        "priority": "low",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Develop Comprehensive Testing and Validation Framework",
+        "description": "Create end-to-end testing framework covering all MCP integrations, workflow orchestration, and system reliability",
+        "details": "Build comprehensive test suite covering: MCP server functionality, registry workflow execution, Task-master integration, Qdrant operations, subagent deployment, QA infrastructure integration, project initialization workflows, error handling and recovery, performance under load, and security validation. Implement integration tests for complete user journeys: new project bootstrap, existing project migration, task execution with capability management, QA orchestration workflows, and memory management operations.",
+        "testStrategy": "Execute full test suite with coverage metrics, validate all integration points, test error scenarios and recovery, performance benchmarking, security scan results, and user acceptance testing for complete workflows",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          4,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Documentation and User Experience Polish",
+        "description": "Create comprehensive documentation, user guides, and README files for the complete MCP environment system",
+        "details": "Develop user documentation covering: installation and setup procedures, registry configuration guide, project initialization workflows, MCP server configuration, subagent management, QA infrastructure setup, troubleshooting guides, and best practices. Create README files for each MCP component, update existing documentation to reflect new capabilities, and ensure consistency across all documentation. Include migration guides for existing users and security considerations.",
+        "testStrategy": "Validate documentation accuracy through user testing, ensure all procedures work as documented, test setup instructions on fresh systems, verify troubleshooting guides resolve common issues, and validate completeness of coverage",
+        "priority": "low",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Performance Optimization and Production Readiness",
+        "description": "Optimize system performance, implement monitoring, and ensure production readiness with proper error handling and recovery mechanisms",
+        "details": "Implement performance optimizations: vector search optimization with rerankers, efficient memory management, concurrent operation handling, and resource usage monitoring. Add operational monitoring for all services, implement graceful degradation for failed MCPs, create backup and recovery procedures, and ensure high availability patterns. Optimize startup times, implement caching where appropriate, and ensure system stability under various load conditions.",
+        "testStrategy": "Performance benchmarking under various loads, monitoring system effectiveness validation, failover and recovery testing, resource usage analysis, startup time optimization verification, and stress testing of all components",
+        "priority": "low",
+        "dependencies": [
+          8,
+          9,
+          10
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-25T14:14:24.898Z",
+      "updated": "2025-08-25T17:05:37.195Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

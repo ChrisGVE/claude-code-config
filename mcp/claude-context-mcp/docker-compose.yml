@@ -8,8 +8,8 @@ services:
       ETCD_DATA_DIR: /var/lib/milvus/etcd
       COMMON_STORAGETYPE: local
     ports:
-      - "19530:19530"  # Milvus API port
-      - "9091:9091"    # Milvus metrics port
+      - "19530:19530" # Milvus API port
+      - "9091:9091" # Milvus metrics port
     healthcheck:
       test:
         - "CMD-SHELL"
@@ -18,7 +18,7 @@ services:
       timeout: 3s
       retries: 60
     volumes:
-      - /Users/chris/dev/ai/mcp/persistent_memory/milvus/volumes:/var/lib/milvus
+      - /Users/chris/dev/ai/claude-code-cfg/persistent_memory/milvus/volumes:/var/lib/milvus
 
   claude-context-mcp:
     build:

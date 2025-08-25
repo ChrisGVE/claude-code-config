@@ -17,6 +17,11 @@
             "type": "weighted",
             "burnType": "tokens"
           },
+          "version": { "enabled": true }
+        }
+      },
+      {
+        "segments": {
           "metrics": {
             "enabled": true,
             "showResponseTime": true,
@@ -26,11 +31,6 @@
             "showLinesAdded": true,
             "showLinesRemoved": true
           },
-          "version": { "enabled": true }
-        }
-      },
-      {
-        "segments": {
           "git": {
             "enabled": true,
             "showSha": false,

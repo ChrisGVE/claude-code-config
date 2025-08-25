@@ -13,7 +13,7 @@ This repository contains centralized configuration for Claude Code and related M
 - `claude/` - Claude Code configuration files
 - `mcp/` - MCP server configurations and tools
 - `config/` - Additional configuration files
-- `persistent_memory/` - Local memory storage (git-ignored)
+- `$XDG_DATA_HOME/claude/persistent_memory/` - Local memory storage (external)
 - `prompts/` - System and project prompts
 - `scripts/` - Setup and utility scripts
 
@@ -26,4 +26,4 @@ This repository contains centralized configuration for Claude Code and related M
 - Local Data MCP
 - Qdrant vector database
 
-Data storage directories (memory/milvus/qdrant) are excluded from git.
+Data storage is located in `$XDG_DATA_HOME/claude/persistent_memory/` with subdirectories for memory, milvus, and qdrant.
