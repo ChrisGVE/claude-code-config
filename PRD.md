@@ -30,11 +30,14 @@ The project is defined in three parts:
 
 ## Codebase Context
 
-- **Claude-Context-MCP** provides semantic and structural codebase retrieval.
-- Embedding: handled locally with Ollama (nomic-embed-text).
-- DB backend: **Milvus (dedicated to claude-context only)** - self-contained with Claude-Context. 
-- **Architectural Decision**: Milvus and Qdrant operate as separate, specialized vector stores due to claude-context's Milvus dependency and Qdrant's superior ingestion performance and recall for project memory.
-- **Claude Code** and **development subagents** query Claude-Context for code context, never reindex code themselves.
+**UPDATE (2025-08-26)**: Replacing claude-context/Milvus with unified Qdrant system. See [`qdrant-unified-prd.md`](./qdrant-unified-prd.md).
+
+- **Project-Code-Daemon** (Rust) provides continuous code indexing with file watching
+- **Project-Code-MCP** provides semantic and structural codebase retrieval via Qdrant
+- Embedding: Dense (all-MiniLM-L6-v2) + Sparse (BM25) for hybrid search
+- DB backend: **Qdrant (unified for all project data)** - single vector store for code, docs, and memory
+- **Architectural Decision**: Unified Qdrant eliminates dual vector store complexity, provides better control, and superior performance
+- **Claude Code** and **development subagents** query Project-Code-MCP for code context
 
 ## Project Memory
 
@@ -601,10 +604,9 @@ The Qdrant MCP requires you to define the payload used by `qdrant-store`/`qdrant
 ## Infrastructure
 
 **Core Services:**
-- **Milvus**: Claude-Context semantic search (self-contained, dedicated to code context)
-- **Qdrant**: Project memory (local, Docker) - superior ingestion performance and recall for project data
-- **Dual Vector Store Rationale**: Milvus required by claude-context (non-negotiable), Qdrant chosen for project memory due to faster ingestion and higher recall metrics
-- **Ollama**: Embeddings (nomic-embed-text for Claude-Context + ingest-web)
+- **Qdrant**: Unified vector store for all project data (code, docs, memory) - local or Docker
+- **Project-Code-Daemon**: Rust daemon for continuous indexing (launchctl/systemd managed)
+- **Ollama**: Optional for embeddings (daemon uses built-in FastEmbed or Candle)
 - **SearxNG**: Search aggregator for ingest-web (local Docker)
 
 **QA Infrastructure:**
@@ -621,8 +623,8 @@ The Qdrant MCP requires you to define the payload used by `qdrant-store`/`qdrant
 - **8080**: SearxNG
 - **8081**: ReportPortal
 - **8082**: Kiwi TCMS
-- **11434**: Ollama (default)
-- **19530**: Milvus (default)
+- **8090**: Project-Code-Daemon
+- **11434**: Ollama (optional)
 
 **Tool Installation Preference:**
 1. **Global tools**: `uv tool install <mcp>` or `npm install -g <mcp>`
