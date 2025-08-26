@@ -315,11 +315,191 @@
         ],
         "status": "pending",
         "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Develop Qdrant Unified Code Indexing System",
+        "description": "Build the project-code-daemon (Rust) and project-code-mcp to replace claude-context MCP and Milvus with a unified Qdrant-based architecture",
+        "details": "Create a Rust daemon for continuous code indexing with:\n- File watching with git-aware ignores  \n- Dense + sparse embeddings (hybrid search)\n- LaunchAgent/systemd integration\n- HTTP/Unix socket API\n- Per-project Qdrant collections\n- Document and web ingestion capabilities\n\nCreate Python MCP using FastMCP with:\n- Search tools (dense/sparse/hybrid modes)\n- Daemon control (activate/deactivate)\n- Session lifecycle hooks\n- Multi-collection federation\n\nTarget performance:\n- Search latency P95 ≤ 120ms\n- Indexing ≥ 300 chunks/sec\n- Save-to-search ≤ 2 seconds",
+        "testStrategy": "Integration tests for index→search roundtrip. Performance benchmarks against claude-context baseline. Parallel operation testing during migration period.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Rust project structure for daemon",
+            "description": "Initialize Rust project with tokio async runtime, HTTP server dependencies, and basic project structure",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 2,
+            "title": "Implement file watcher with git-aware ignores",
+            "description": "Create file watching system using notify-rs with support for .gitignore patterns and custom exclusions",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.1"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 3,
+            "title": "Build HTTP API server with activation endpoints",
+            "description": "Implement HTTP server with endpoints for activate, deactivate, status, reindex, and ingest operations",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.1"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 4,
+            "title": "Implement dense embedding generation",
+            "description": "Integrate FastEmbed or Candle for generating all-MiniLM-L6-v2 dense embeddings (384-dim)",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.1"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 5,
+            "title": "Implement sparse vector generation with BM25",
+            "description": "Add BM25 sparse vector generation for lexical search capabilities",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.4"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 6,
+            "title": "Integrate Qdrant client and collection management",
+            "description": "Implement Qdrant client integration with collection creation, named vectors setup, and schema management",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.5"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 7,
+            "title": "Implement chunking and batching logic",
+            "description": "Create sliding window chunker with debouncing, batching, and stable ID generation for idempotent updates",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.2"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 8,
+            "title": "Create Python MCP server with FastMCP",
+            "description": "Set up Python MCP server using FastMCP framework with basic tool structure and daemon communication",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.3"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 9,
+            "title": "Implement hybrid search with RRF fusion",
+            "description": "Create search implementation supporting dense, sparse, and hybrid modes with Reciprocal Rank Fusion",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.8",
+              "13.6"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 10,
+            "title": "Create LaunchAgent and systemd configurations",
+            "description": "Set up launchctl plist for macOS and systemd service for Linux with proper restart policies and logging",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "13.3",
+              "13.7"
+            ],
+            "parentTaskId": 13
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Migrate from claude-context/Milvus to Unified Qdrant System",
+        "description": "Execute phased migration from claude-context MCP and Milvus to the new project-code-daemon and project-code-mcp with zero downtime",
+        "details": "Migration phases:\n1. Parallel Operation: Run new system alongside claude-context for A/B testing\n2. Feature Parity: Implement all missing features, validate search quality\n3. Cutover: Update prompts and configurations to use new system\n4. Cleanup: Remove claude-context and Milvus, archive migration artifacts\n\nKey activities:\n- Update system prompts to use project-code-mcp tools\n- Modify ingest-web-mcp to use daemon API\n- Update task-master integration points\n- Create rollback procedures\n- Document new architecture",
+        "testStrategy": "A/B search quality testing. Feature parity checklist validation. Zero-downtime cutover verification. Rollback procedure testing.",
+        "status": "pending",
+        "dependencies": [
+          13
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up parallel operation environment",
+            "description": "Deploy new system alongside claude-context for A/B testing and quality comparison",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
+          },
+          {
+            "id": 2,
+            "title": "Create search quality comparison tests",
+            "description": "Build test suite comparing search results between claude-context and new system for quality metrics",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "14.1"
+            ],
+            "parentTaskId": 14
+          },
+          {
+            "id": 3,
+            "title": "Update system prompts and configurations",
+            "description": "Modify all system prompts, MCP configurations, and task-master references to use new project-code-mcp",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "14.2"
+            ],
+            "parentTaskId": 14
+          },
+          {
+            "id": 4,
+            "title": "Execute cutover and cleanup",
+            "description": "Perform final cutover, disable claude-context/Milvus, verify system stability, and remove deprecated components",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              "14.3"
+            ],
+            "parentTaskId": 14
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-08-25T14:14:24.898Z",
-      "updated": "2025-08-26T13:14:34.367Z",
+      "updated": "2025-08-26T19:14:20.176Z",
       "description": "Tasks for master context"
     }
   }
