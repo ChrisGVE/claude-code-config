@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Create Registry System and Project Bootstrap Workflows
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Design and implement the registry.yaml system with workflow definitions for automated project setup and capability deployment
+# Details:
+Create comprehensive registry.yaml with MCP definitions, subagent mappings, and workflow orchestration syntax. Define workflow operations: file operations (copy_into_project, move_within_project), directory creation, git operations, project_registry actions (sync, deploy_agent, deploy_mcp), task-master operations, and safety checks. Implement the 3-step new project workflow: Project Scaffolding Setup, PRD Iterative Refinement, Task-master Initialization and Execution Setup. Build existing project migration workflows with entry point detection.
+
+# Test Strategy:
+Validate registry.yaml schema, test workflow execution, verify file operations, test git integration, validate project structure creation, and test rollback capabilities

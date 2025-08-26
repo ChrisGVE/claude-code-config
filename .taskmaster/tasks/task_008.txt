@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Create Project Memory and Context Management
+# Status: pending
+# Dependencies: 1, 5
+# Priority: medium
+# Description: Implement Qdrant-based project memory system with summary-first retrieval and content hydration patterns for efficient context management
+# Details:
+Build project memory management with per-project Qdrant collections using schema: project, type (algorithm|decision|design|note|todo|adr), tags, stage (draft|refined|final), summary (≤200 tokens), content_ref, related_task_ids, timestamps. Implement summary-first retrieval pattern with explicit full content hydration. Create memory storage tools for algorithms, ADRs, decisions, and design documents. Integrate with ingest-web-mcp for external content storage. Implement memory querying with filters and semantic search capabilities.
+
+# Test Strategy:
+Test memory storage and retrieval, validate schema compliance, test summary-first patterns, verify content hydration, validate semantic search accuracy, and test cross-project isolation

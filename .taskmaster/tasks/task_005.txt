@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Implement ingest-web-mcp with SearxNG Integration
+# Status: pending
+# Dependencies: 1
+# Priority: medium
+# Description: Adapt existing ingest-web-mcp to integrate with SearxNG for web content ingestion and push results into Qdrant instead of Milvus
+# Details:
+Modify ingest-web-mcp pipeline: SearxNG search with JSON format, URL deduplication using tldextract, content fetching with retries via tenacity, parsing using trafilatura with BeautifulSoup fallback, summarization into ≤200 tokens, embedding via Ollama nomic-embed-text (768-d), and upsert to Qdrant with project-specific collections. Implement content filtering for malicious domains and basic validation. Set up SearxNG Docker container on port 8080 with proper configuration.
+
+# Test Strategy:
+Test SearxNG API integration, validate content parsing pipeline, verify Qdrant upsert operations, test embedding generation, validate content filtering, and test end-to-end web research workflows

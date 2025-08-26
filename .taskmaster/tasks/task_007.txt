@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Develop Claude Debugger MCP with QA Infrastructure
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Build specialized MCP server for QA orchestration using Temporal workflows with Gitea, Kiwi TCMS, and ReportPortal integration
+# Details:
+Implement Claude Debugger MCP as self-contained server with Temporal workflow orchestration. Set up QA infrastructure stack: Gitea/Forgejo (port 3000) for Git and Issues, Kiwi TCMS (port 8082) for test campaign management, ReportPortal (port 8081) for analytics, Temporal (port 7233) for workflows, Langfuse for agent tracing. Create simplified task hierarchy: campaign → fix task → bug subtasks. Implement progressive testing, smart circuit breaking, and container isolation. Integrate with Task-master for QA task creation and status updates.
+
+# Test Strategy:
+Test Temporal workflow execution, validate QA infrastructure integration, test bug lifecycle management, verify campaign-based testing, validate Task-master integration, and test error handling workflows

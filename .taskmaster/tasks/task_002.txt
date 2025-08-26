@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Implement claude-capability-manager MCP Server
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Develop the core MCP server that handles dynamic capability detection, installation, and project initialization using FastMCP framework
+# Details:
+Build Python-based MCP server using claude-code-sdk and FastMCP framework. Implement dual-mode operation (stdio MCP server and CLI tool). Core functionality includes: capability detection from PRDs, registry-driven MCP/subagent deployment, project scaffolding with .claude folder structure, template management for CLAUDE.md variants (bootstrap, step2, production). Support both new project and existing project workflows. Integrate with registry.yaml for capability mapping to required tools.
+
+# Test Strategy:
+Unit tests for capability detection logic, integration tests with registry.yaml, end-to-end project initialization testing, CLI mode validation, and error handling for failed tool deployments

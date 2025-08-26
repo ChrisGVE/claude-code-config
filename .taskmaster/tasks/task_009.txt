@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Implement System Prompt Management and Template System
+# Status: pending
+# Dependencies: 2, 3
+# Priority: low
+# Description: Create dynamic system prompt management with specialized templates for different workflow phases and project states
+# Details:
+Develop multi-template system for CLAUDE.md: CLAUDE.md.bootstrap (initial setup), CLAUDE.md.step2 (PRD refinement with agents), CLAUDE.md.production (main execution). Implement template switching during workflow phases via claude-capability-manager MCP. Create system prompt suggestions for task separation, status management, retrieval discipline, code retrieval patterns, traceability, role boundaries, QA workflows, and error handling. Integrate with existing CLAUDE.md.template and global system prompts.
+
+# Test Strategy:
+Test template switching mechanisms, validate prompt effectiveness, test workflow phase transitions, verify system prompt consistency, and validate user experience across phases

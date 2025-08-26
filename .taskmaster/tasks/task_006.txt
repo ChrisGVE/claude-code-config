@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Build Subagent Management and Deployment System
+# Status: pending
+# Dependencies: 3
+# Priority: medium
+# Description: Create on-demand subagent deployment system with phase-based activation and registry-driven selection from the awesome-claude-code-subagents collection
+# Details:
+Implement subagent lifecycle management: registry-based selection using capabilities matching, phase-based deployment (bootstrap, prd_revision, development, implementation), on-demand activation with no permanent agents. Create subagent definitions for core agents: Planner (PRD to task DAG conversion), Architect (ADR management), Backend/Frontend Engineers, Testing Specialists. Integrate with 100+ community agents from resources/awesome-claude-code-subagents. Implement agent customization pipeline with automated adaptation.
+
+# Test Strategy:
+Test subagent selection algorithms, validate phase-based deployment, test agent lifecycle management, verify capability matching logic, and validate community agent integration
