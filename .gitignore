@@ -1,8 +1,5 @@
 .DS_Store
 mcp/claude-context-mcp/.env
-persistent_memory/memory/*
-persistent_memory/qdrant/*
-persistent_memory/milvus/*
 claude.json
 claude/projects
 claude/shell-snapshots
@@ -34,3 +31,4 @@ node_modules/
 # Task files
 # tasks.json
 # tasks/ 
+persistent_memory/milvus/volumes
