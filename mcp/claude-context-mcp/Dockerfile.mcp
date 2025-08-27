@@ -1,5 +1,0 @@
-FROM node:20-bookworm-slim
-RUN npm i -g @zilliz/claude-context-mcp
-WORKDIR /workspace
-ENTRYPOINT ["claude-context-mcp"]
-

@@ -326,7 +326,7 @@
           15
         ],
         "priority": "high",
-        "details": "Create a Rust daemon for continuous code indexing with:\n- File watching with git-aware ignores  \n- Dense + sparse embeddings (hybrid search)\n- LaunchAgent/systemd integration\n- HTTP/Unix socket API\n- Per-project Qdrant collections\n- Document and web ingestion capabilities\n\nCreate Python MCP using FastMCP with:\n- Search tools (dense/sparse/hybrid modes)\n- Daemon control (activate/deactivate)\n- Session lifecycle hooks\n- Multi-collection federation\n\nTarget performance:\n- Search latency P95 ≤ 120ms\n- Indexing ≥ 300 chunks/sec\n- Save-to-search ≤ 2 seconds",
+        "details": "Create a Rust daemon for continuous code indexing with:\n- File watching with git-aware ignores  \n- Dense + sparse embeddings (hybrid search)\n- LaunchAgent/systemd integration\n- HTTP/Unix socket API\n- Per-project Qdrant collections\n- Document and web ingestion capabilities\n\nCreate Python MCP using FastMCP with:\n- Search tools (dense/sparse/hybrid modes)\n- Daemon control (activate/deactivate)\n- Session lifecycle hooks\n- Multi-collection federation\n\nTarget performance:\n- Search latency P95 ≤ 120ms\n- Indexing ≥ 300 chunks/sec\n- Save-to-search ≤ 2 seconds\n<info added on 2025-08-27T18:26:43.987Z>\n**Implementation Architecture Update:**\n\nFollowing community MCP analysis (Task 15), adopting hybrid fork-and-extend strategy to reduce development complexity:\n\n**Revised Architecture - Three Components:**\n1. **memexd daemon** - Custom Rust daemon for file watching and indexing \n2. **qdrant-multi-mcp** - Fork of proven `mcp-server-qdrant-retrieve` with added write operations\n3. **memexd-control-mcp** - Lightweight daemon control wrapper\n\n**Strategic Benefits:**\n- Reuses battle-tested multi-collection search from qdrant-retrieve\n- Reduces MCP development from scratch build to fork-and-extend\n- Leverages existing TypeScript codebase with proven search patterns\n- Maintains performance targets while reducing implementation risk\n\n**Technical Specifications Confirmed:**\n- Embedding model: all-MiniLM-L6-v2 (384-dimensional)\n- Sparse vector method: BM25 for lexical search\n- Fusion algorithm: RRF (Reciprocal Rank Fusion)\n\nThis approach significantly reduces the Python MCP development scope from full custom implementation to extending existing proven functionality.\n</info added on 2025-08-27T18:26:43.987Z>",
         "testStrategy": "Integration tests for index→search roundtrip. Performance benchmarks against claude-context baseline. Parallel operation testing during migration period.",
         "subtasks": [
           {
@@ -438,6 +438,28 @@
             ],
             "details": "",
             "testStrategy": ""
+          },
+          {
+            "id": 11,
+            "title": "Fork and extend mcp-server-qdrant-retrieve",
+            "description": "Fork gergelyszerovay/mcp-server-qdrant-retrieve and extend with write operations (upsert_points, delete_points, create_collection) while preserving existing multi-collection search capabilities",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              3
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 12,
+            "title": "Port Claude Qdrant MCP to Python with FastMCP",
+            "description": "Transpose marlian/claude-qdrant-mcp from TypeScript to Python using FastMCP framework. Replace BGE-M3 with all-MiniLM-L6-v2 (384-dim), add BM25 sparse vectors, preserve seeding/ingestion pipeline, and adapt CLIENT_COLLECTIONS to project-based configuration.",
+            "details": "",
+            "status": "pending",
+            "dependencies": [
+              3
+            ],
+            "parentTaskId": 13
           }
         ]
       },
@@ -514,7 +536,7 @@
             "title": "Analyze claude-context MCP architecture and patterns",
             "description": "Deep dive into claude-context codebase to extract chunking strategies, file handling, Milvus integration patterns, and search implementation",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 15
           },
@@ -523,7 +545,7 @@
             "title": "Analyze claude-task-master MCP server implementation",
             "description": "Study task-master MCP architecture, CLI integration patterns, task management workflows, and FastMCP usage patterns",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 15
           },
@@ -532,7 +554,7 @@
             "title": "Analyze official Qdrant MCP server capabilities and limitations",
             "description": "Study qdrant-mcp implementation, single-collection constraints, search patterns, and identify multi-collection requirements",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 15
           },
@@ -541,7 +563,7 @@
             "title": "Analyze Serena LSP integration and file watching patterns",
             "description": "Study Serena's LSP usage, symbol extraction, file monitoring approaches, and language-specific handling for integration insights",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 15
           },
@@ -550,7 +572,7 @@
             "title": "Synthesize findings and create daemon architecture specification",
             "description": "Consolidate analysis results into comprehensive architecture specification for the project-code daemon and multi-collection MCP design",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               "15.1",
               "15.2",
@@ -560,11 +582,24 @@
             "parentTaskId": 15
           }
         ]
+      },
+      {
+        "id": 16,
+        "title": "Reserve Qdrant Retrieve MCP for Global Multi-Collection Search",
+        "description": "Add reserve task for installing gergelyszerovay/mcp-server-qdrant-retrieve to enable read-only search across ALL collections in the Qdrant instance when global multi-collection search capabilities are needed.",
+        "details": "Install and configure the gergelyszerovay/mcp-server-qdrant-retrieve MCP server as a reserve capability for global search operations. This MCP provides read-only search functionality across all collections in the Qdrant instance, complementing the project-scoped operations of the unified system. Keep this as a separate concern from project-specific operations until truly needed for cross-project search or global content discovery. Configuration should include: Qdrant connection parameters, authentication if required, search result limits and filtering options, and integration points with the main MCP environment. Document when and why this global search capability might be needed (e.g., cross-project reference discovery, global content analysis, research across multiple project contexts). Ensure this MCP can coexist with the project-code-mcp without conflicts.",
+        "testStrategy": "Verify MCP server installation and Qdrant connectivity. Test read-only search across multiple collections without interfering with project-specific operations. Validate search result accuracy and performance. Test coexistence with project-code-mcp to ensure no conflicts. Document search capabilities and limitations compared to project-scoped search.",
+        "status": "pending",
+        "dependencies": [
+          13
+        ],
+        "priority": "low",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-08-25T14:14:24.898Z",
-      "updated": "2025-08-26T20:15:13.434Z",
+      "updated": "2025-08-27T19:37:09.335Z",
       "description": "Tasks for master context"
     }
   }

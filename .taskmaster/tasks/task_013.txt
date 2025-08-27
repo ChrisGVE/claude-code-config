@@ -1,0 +1,125 @@
+# Task ID: 13
+# Title: Develop Qdrant Unified Code Indexing System
+# Status: pending
+# Dependencies: 1, 15
+# Priority: high
+# Description: Build the project-code-daemon (Rust) and project-code-mcp to replace claude-context MCP and Milvus with a unified Qdrant-based architecture
+# Details:
+Create a Rust daemon for continuous code indexing with:
+- File watching with git-aware ignores  
+- Dense + sparse embeddings (hybrid search)
+- LaunchAgent/systemd integration
+- HTTP/Unix socket API
+- Per-project Qdrant collections
+- Document and web ingestion capabilities
+
+Create Python MCP using FastMCP with:
+- Search tools (dense/sparse/hybrid modes)
+- Daemon control (activate/deactivate)
+- Session lifecycle hooks
+- Multi-collection federation
+
+Target performance:
+- Search latency P95 ≤ 120ms
+- Indexing ≥ 300 chunks/sec
+- Save-to-search ≤ 2 seconds
+<info added on 2025-08-27T18:26:43.987Z>
+**Implementation Architecture Update:**
+
+Following community MCP analysis (Task 15), adopting hybrid fork-and-extend strategy to reduce development complexity:
+
+**Revised Architecture - Three Components:**
+1. **memexd daemon** - Custom Rust daemon for file watching and indexing 
+2. **qdrant-multi-mcp** - Fork of proven `mcp-server-qdrant-retrieve` with added write operations
+3. **memexd-control-mcp** - Lightweight daemon control wrapper
+
+**Strategic Benefits:**
+- Reuses battle-tested multi-collection search from qdrant-retrieve
+- Reduces MCP development from scratch build to fork-and-extend
+- Leverages existing TypeScript codebase with proven search patterns
+- Maintains performance targets while reducing implementation risk
+
+**Technical Specifications Confirmed:**
+- Embedding model: all-MiniLM-L6-v2 (384-dimensional)
+- Sparse vector method: BM25 for lexical search
+- Fusion algorithm: RRF (Reciprocal Rank Fusion)
+
+This approach significantly reduces the Python MCP development scope from full custom implementation to extending existing proven functionality.
+</info added on 2025-08-27T18:26:43.987Z>
+
+# Test Strategy:
+Integration tests for index→search roundtrip. Performance benchmarks against claude-context baseline. Parallel operation testing during migration period.
+
+# Subtasks:
+## 1. Set up Rust project structure for daemon [pending]
+### Dependencies: None
+### Description: Initialize Rust project with tokio async runtime, HTTP server dependencies, and basic project structure
+### Details:
+
+
+## 2. Implement file watcher with git-aware ignores [pending]
+### Dependencies: 13.1
+### Description: Create file watching system using notify-rs with support for .gitignore patterns and custom exclusions
+### Details:
+
+
+## 3. Build HTTP API server with activation endpoints [pending]
+### Dependencies: 13.1
+### Description: Implement HTTP server with endpoints for activate, deactivate, status, reindex, and ingest operations
+### Details:
+
+
+## 4. Implement dense embedding generation [pending]
+### Dependencies: 13.1
+### Description: Integrate FastEmbed or Candle for generating all-MiniLM-L6-v2 dense embeddings (384-dim)
+### Details:
+
+
+## 5. Implement sparse vector generation with BM25 [pending]
+### Dependencies: 13.4
+### Description: Add BM25 sparse vector generation for lexical search capabilities
+### Details:
+
+
+## 6. Integrate Qdrant client and collection management [pending]
+### Dependencies: 13.5
+### Description: Implement Qdrant client integration with collection creation, named vectors setup, and schema management
+### Details:
+
+
+## 7. Implement chunking and batching logic [pending]
+### Dependencies: 13.2
+### Description: Create sliding window chunker with debouncing, batching, and stable ID generation for idempotent updates
+### Details:
+
+
+## 8. Create Python MCP server with FastMCP [pending]
+### Dependencies: 13.3
+### Description: Set up Python MCP server using FastMCP framework with basic tool structure and daemon communication
+### Details:
+
+
+## 9. Implement hybrid search with RRF fusion [pending]
+### Dependencies: 13.8, 13.6
+### Description: Create search implementation supporting dense, sparse, and hybrid modes with Reciprocal Rank Fusion
+### Details:
+
+
+## 10. Create LaunchAgent and systemd configurations [pending]
+### Dependencies: 13.3, 13.7
+### Description: Set up launchctl plist for macOS and systemd service for Linux with proper restart policies and logging
+### Details:
+
+
+## 11. Fork and extend mcp-server-qdrant-retrieve [pending]
+### Dependencies: 13.3
+### Description: Fork gergelyszerovay/mcp-server-qdrant-retrieve and extend with write operations (upsert_points, delete_points, create_collection) while preserving existing multi-collection search capabilities
+### Details:
+
+
+## 12. Port Claude Qdrant MCP to Python with FastMCP [pending]
+### Dependencies: 13.3
+### Description: Transpose marlian/claude-qdrant-mcp from TypeScript to Python using FastMCP framework. Replace BGE-M3 with all-MiniLM-L6-v2 (384-dim), add BM25 sparse vectors, preserve seeding/ingestion pipeline, and adapt CLIENT_COLLECTIONS to project-based configuration.
+### Details:
+
+

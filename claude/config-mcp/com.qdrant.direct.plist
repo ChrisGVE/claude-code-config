@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.qdrant.direct</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/local/bin/qdrant</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>QDRANT__STORAGE__STORAGE_PATH</key>
+		<string>/Users/chris/.local/share/claude/persistent_memory/qdrant/storage</string>
+		<key>QDRANT__STORAGE__SNAPSHOTS_PATH</key>
+		<string>/Users/chris/.local/share/claude/persistent_memory/qdrant/snapshots</string>
+		<key>QDRANT__STORAGE__TEMP_PATH</key>
+		<string>/Users/chris/.local/share/claude/persistent_memory/qdrant/tmp</string>
+		<key>QDRANT__TELEMETRY_DISABLED</key>
+		<string>true</string>
+	</dict>
+	<key>KeepAlive</key>
+	<true/>
+</dict>
+</plist>

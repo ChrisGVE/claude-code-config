@@ -1,0 +1,48 @@
+# Task ID: 14
+# Title: Migrate from claude-context/Milvus to Unified Qdrant System
+# Status: pending
+# Dependencies: 13
+# Priority: high
+# Description: Execute phased migration from claude-context MCP and Milvus to the new project-code-daemon and project-code-mcp with zero downtime
+# Details:
+Migration phases:
+1. Parallel Operation: Run new system alongside claude-context for A/B testing
+2. Feature Parity: Implement all missing features, validate search quality
+3. Cutover: Update prompts and configurations to use new system
+4. Cleanup: Remove claude-context and Milvus, archive migration artifacts
+
+Key activities:
+- Update system prompts to use project-code-mcp tools
+- Modify ingest-web-mcp to use daemon API
+- Update task-master integration points
+- Create rollback procedures
+- Document new architecture
+
+# Test Strategy:
+A/B search quality testing. Feature parity checklist validation. Zero-downtime cutover verification. Rollback procedure testing.
+
+# Subtasks:
+## 1. Set up parallel operation environment [pending]
+### Dependencies: None
+### Description: Deploy new system alongside claude-context for A/B testing and quality comparison
+### Details:
+
+
+## 2. Create search quality comparison tests [pending]
+### Dependencies: 14.1
+### Description: Build test suite comparing search results between claude-context and new system for quality metrics
+### Details:
+
+
+## 3. Update system prompts and configurations [pending]
+### Dependencies: 14.2
+### Description: Modify all system prompts, MCP configurations, and task-master references to use new project-code-mcp
+### Details:
+
+
+## 4. Execute cutover and cleanup [pending]
+### Dependencies: 14.3
+### Description: Perform final cutover, disable claude-context/Milvus, verify system stability, and remove deprecated components
+### Details:
+
+
