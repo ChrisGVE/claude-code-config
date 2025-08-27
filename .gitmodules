@@ -76,3 +76,6 @@
 [submodule "mcp/memexd"]
 	path = mcp/memexd
 	url = git@github.com:ChrisGVE/memexd.git
+[submodule "mcp/workspace-qdrant-mcp"]
+	path = mcp/workspace-qdrant-mcp
+	url = https://github.com/ChrisGVE/workspace-qdrant-mcp.git
