@@ -1,6 +1,3 @@
-[submodule "mcp/ingest-web-mcp"]
-	path = mcp/ingest-web-mcp
-	url = git@github.com:ChrisGVE/claude-code-ingest-web.git
 [submodule "mcp/claude-capability-manager"]
 	path = mcp/claude-capability-manager
 	url = git@github.com:ChrisGVE/claude-code-capabilities.git
@@ -73,9 +70,6 @@
 [submodule "mcp/qdrant"]
 	path = mcp/qdrant
 	url = https://github.com/qdrant/qdrant.git
-[submodule "mcp/memexd"]
-	path = mcp/memexd
-	url = git@github.com:ChrisGVE/memexd.git
 [submodule "mcp/workspace-qdrant-mcp"]
 	path = mcp/workspace-qdrant-mcp
 	url = https://github.com/ChrisGVE/workspace-qdrant-mcp.git
