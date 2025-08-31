@@ -79,3 +79,6 @@
 [submodule "mcp/workspace-qdrant-mcp"]
 	path = mcp/workspace-qdrant-mcp
 	url = https://github.com/ChrisGVE/workspace-qdrant-mcp.git
+[submodule "resources/claude-code-guide"]
+	path = resources/claude-code-guide
+	url = https://github.com/zebbern/claude-code-guide.git
