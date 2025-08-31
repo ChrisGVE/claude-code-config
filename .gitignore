@@ -6,6 +6,7 @@ claude/shell-snapshots
 claude/statsig
 claude/todos
 claude/powerline/usage
+claude/local/
 
 # Logs
 logs
@@ -31,4 +32,3 @@ node_modules/
 # Task files
 # tasks.json
 # tasks/ 
-persistent_memory/milvus/volumes
