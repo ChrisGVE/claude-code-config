@@ -76,3 +76,12 @@
 [submodule "resources/claude-code-guide"]
 	path = resources/claude-code-guide
 	url = https://github.com/zebbern/claude-code-guide.git
+[submodule "resources/ccusage"]
+	path = resources/ccusage
+	url = https://github.com/ryoppippi/ccusage.git
+[submodule "mcp/commit-helper-mcp"]
+	path = mcp/commit-helper-mcp
+	url = https://github.com/jolfr/commit-helper-mcp
+[submodule "resources/davila7-claude-code-templates"]
+	path = resources/davila7-claude-code-templates
+	url = https://github.com/davila7/claude-code-templates

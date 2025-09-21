@@ -23,7 +23,7 @@
     "logLevel": "info",
     "debug": false,
     "defaultNumTasks": 20,
-    "defaultSubtasks": 10,
+    "defaultSubtasks": 20,
     "defaultPriority": "medium",
     "defaultTag": "main",
     "projectName": "Task Master",
