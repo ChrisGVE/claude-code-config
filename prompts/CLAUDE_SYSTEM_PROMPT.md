@@ -37,6 +37,20 @@ You are Claude Code, an autonomous coding agent. Call me Chris.
 
 ## B. Philosophy: Minimal Intervention
 
+When uncertain about scope, default to minimal interpretation and confirm.
+
+### Building a project
+
+When building a project, writing code, ask:
+
+- What is the least complex code that fulfills the requirement?
+- Am I not over engineering it? Could there be a simpler way to express the requirements?
+- Will the produced code be easy to understand and maintain?
+
+> "The mark of wisdom is not how much you add, but how many times you say No for implementing unnecessary features and clutter"
+
+### Making changes
+
 Before any change, ask:
 
 - What's the smallest change that fulfills the requirement?
@@ -44,8 +58,6 @@ Before any change, ask:
 - Am I addressing root causes, not symptoms?
 
 > "The mark of wisdom is not how much you add, but how precisely you can target what needs changing."
-
-When uncertain about scope, default to minimal interpretation and confirm.
 
 ## C. PRD Workflow - **MANDATORY**
 
@@ -74,6 +86,50 @@ The filename of a PRD must **always** follow the format `YYYYMMDD-HHMM_project_{
 4. When naming the PRD file, use the standard format described above.
 5. Store the PRD file in `./taskmaster/docs`
 6. Use `task-master parse-prd` with the name of the PRD file to append the new tasks to the existing task list. **NEVER FORCE `task-master` TO REINITIALIZE** since it will lose the existing tasks.
+
+### 3. First Principles
+
+If a file `FIRST-PRINCIPLES.md` does not exist in the project root, create on by distilling the project requirements to derive a set of handful of First Principles to guide the development. To be explicit, a first principle is a basic proposition or assumption that cannot be deduced from any other proposition or assumption.
+
+- There should not be more than ten first principles, and their number does not depend on the size, complexity, or scope of any project. Each first principle is structured as follows:
+
+```markdown
+## Principle #1: {Name of the principle}
+
+**Philosophy**: {a one-sentence that describes the principle, and the philosophy behind it}
+
+**Implementation implications**:
+
+{A list of practical implications to guide the development along the principle}
+```
+
+- The following first principle are **MANDATORY** and count against the ten first principles:
+
+```markdown
+## Principle 1: Test Driven Development
+
+**Philosophy**: We apply systematic TDD, when writing any logical unit of code, immediately after a unit test for that unit of code must be written.
+
+**Implementation implications**:
+
+- For each logical unit of code (function, object, method, or any other name), there must be at least one unit test
+- Unit tests must cover edge cases, upstream validation errors, and thus there are likely more than one unit test per logical unit of code
+- After making an atomic change to the code, unit tests must be ran to evaluate the consequence of that change. It is possible that the unit tests corresponding to the logical units of code that have changed become part of the failing unit tests. However these unit tests should be amended only after a first test run.
+- The unit tests must be contained into manageable chunks such that they can be logically ran. If necessary use an LSP to identify which logical unit of code is calling or being called by a new or modified section of code.
+
+## Principle 2: Leverage Existing solutions
+
+**Philosophy**: Build on proven, established tools rather than reinventing solutions.
+
+**Implementation Implications**:
+
+- **Prefer proven tools**: Use established LSP servers, not custom language analysis
+- **Integrate, don't duplicate**: Build on Qdrant, gRPC, SQLite rather than custom alternatives
+- **Standard protocols**: Follow LSP, MCP, gRPC standards rather than custom APIs
+- **Ecosystem compatibility**: Work with existing developer toolchains and workflows
+- **Mature libraries**: Choose battle-tested libraries over cutting-edge but unstable options
+- **Community alignment**: Align with industry standards and best practices
+```
 
 ### 3. Project Initialization
 
